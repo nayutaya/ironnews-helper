@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import os
+from google.appengine.ext import webapp
+from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.ext.webapp import template
 from BeautifulSoup import BeautifulSoup
+import json
 
 from hatenabookmark import HatenaBookmark
 
@@ -18,23 +23,24 @@ class TitleFetcher:
 
     return title.string.strip()
 
-
-import os
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.ext.webapp import template
-
-class HomePage(webapp.RequestHandler):
+class HatenaBookmarkGetTitleApi(webapp.RequestHandler):
   def get(self):
     fetcher = TitleFetcher()
-    title = fetcher.fetch_title("http://www.asahi.com/national/update/1031/OSK200910310079.html")
-    html = title
-    self.response.out.write(html)
+    #self.response.out.write(html)
+
+    result = {}
+    urls = [self.request.get("url%02i" % (i + 1)) for i in range(10)]
+    for url in urls:
+      if url != "":
+        title = fetcher.fetch_title(url)
+        result[url] = title
+
+    self.response.out.write(json.write(result))
 
 if __name__ == "__main__":
   application = webapp.WSGIApplication(
     [
-      (r"/", HomePage),
+      (r"/hatena/bookmark/get_title", HatenaBookmarkGetTitleApi),
     ],
     debug = True)
   run_wsgi_app(application)
