@@ -1,0 +1,15 @@
+
+application: ironnews-helper
+version: v1
+runtime: python
+api_version: 1
+
+handlers:
+#- url: /favicon.ico
+#  static_files: public/favicon.ico
+#  upload: public/favicon.ico
+#- url: /robots.txt 
+#  static_files: public/robots.txt 
+#  upload: public/robots.txt 
+- url: /.*
+  script: app.py
