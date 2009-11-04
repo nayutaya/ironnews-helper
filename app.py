@@ -34,6 +34,13 @@ def read_credential():
   f.close()
   return (username, password)
 
+def create_request_xml(url):
+  return (
+    '<entry xmlns="http://purl.org/atom/ns#">'
+    '<title>title</title>'
+    '<link rel="related" type="text/html" href="') + url + ('" />'
+    '</entry>')
+
 
 print "Content-Type: text/plain"
 print ""
@@ -41,15 +48,10 @@ print ""
 username, password = read_credential()
 useragent = "ironnews"
 
-url = "http://www.asahi.com/national/update/1102/SEB200911020008.html"
-
-
 wsse = create_wsse_auth(username, password)
 
-request  = '<entry xmlns="http://purl.org/atom/ns#">'
-request += '<title>title</title>'
-request += '<link rel="related" type="text/html" href="' + url + '" />'
-request += '</entry>'
+url = "http://www.asahi.com/national/update/1102/SEB200911020008.html"
+request = create_request_xml(url)
 
 # Set header for HTTPConnection
 headers = {
@@ -58,11 +60,9 @@ headers = {
   "X-WSSE"      : wsse,
 }
 
-con = httplib.HTTPConnection("b.hatena.ne.jp")
-con.request("POST", "/atom/post", request, headers)
+connection = httplib.HTTPConnection("b.hatena.ne.jp")
+connection.request("POST", "/atom/post", request, headers)
 
-res = con.getresponse()
-#print res
+response = connection.getresponse()
 
-response = dict(status=res.status, reason=res.reason, data=res.read())
-print response["data"]
+print response.read()
