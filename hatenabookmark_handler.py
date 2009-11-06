@@ -52,4 +52,5 @@ class GetTitleApi(webapp.RequestHandler):
           "title": title,
         }
 
+    self.response.headers["Content-Type"] = "text/javascript"
     self.response.out.write(json.write(result))
