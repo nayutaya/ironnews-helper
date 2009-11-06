@@ -1,15 +1,20 @@
 # -*- coding: utf-8 -*-
 
+import sys
 import os
+import logging
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
 from google.appengine.api import memcache
+
+sys.path.append("lib")
 from BeautifulSoup import BeautifulSoup
 import json
-import logging
 
 from hatenabookmark import HatenaBookmark
+
+
 
 import sha
 class TitleFetcher:
