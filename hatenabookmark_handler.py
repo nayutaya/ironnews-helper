@@ -38,19 +38,24 @@ class TitleFetcher:
 
 class GetTitleApi(webapp.RequestHandler):
   def get(self):
+    numbers  = range(1, 10 + 1)
+    urls     = [self.request.get("url%i" % number) for number in numbers]
+    callback = self.request.get("callback")
+
     fetcher = TitleFetcher()
 
     result = {}
-    for i in range(10):
-      number = i + 1
-      url    = self.request.get("url%i" % number)
-
+    for number in numbers:
+      url = urls[number - 1]
       if url != "":
         title = fetcher.fetch_title(url)
         result[number] = {
-          "url": url,
+          "url"  : url,
           "title": title,
         }
 
+    output = json.write(result)
+    if callback != "":
+      output = callback + "(" + output + ")"
     self.response.headers["Content-Type"] = "text/javascript"
-    self.response.out.write(json.write(result))
+    self.response.out.write(output)
