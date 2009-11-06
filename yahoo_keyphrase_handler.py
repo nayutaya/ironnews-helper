@@ -1,18 +1,31 @@
 # -*- coding: utf-8 -*-
 
+import sha
 from google.appengine.ext import webapp
+from google.appengine.api import memcache
+
 import simplejson
 
 import yahoo
 
-def read_application_id():
-  f = open("config/yahoo.id")
-  app_id = f.readline().strip()
-  f.close()
-  return app_id
+class YahooKeyphrase:
+  def __init__(self):
+    f = open("config/yahoo.id")
+    try:
+      self.app_id = f.readline().strip()
+    finally:
+      f.close()
 
-class CachedKeyphrase:
-  pass
+  def create_key(self, text):
+    return "yahoo_keyphrase_" + sha.sha(text.encode("utf-8")).hexdigest()
+
+  def extract(self, text):
+    key   = self.create_key(text)
+    value = memcache.get(key)
+    if value is None:
+      value = yahoo.Keyphrase.extract(self.app_id, text)
+      memcache.add(key, value, 60 * 60)
+    return value
 
 class ExtractApi(webapp.RequestHandler):
   def get(self):
@@ -20,9 +33,9 @@ class ExtractApi(webapp.RequestHandler):
     texts    = [self.request.get("text%i" % number) for number in numbers]
     callback = self.request.get("callback")
 
-    app_id = read_application_id()
+    yk = YahooKeyphrase()
 
-    result = yahoo.Keyphrase.extract(app_id, texts[0])
+    result = yk.extract(texts[0])
 
     json = simplejson.dumps(result, separators=(',',':'))
     if callback != "": json = callback + "(" + json + ")"
