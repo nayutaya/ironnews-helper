@@ -35,7 +35,16 @@ class ExtractApi(webapp.RequestHandler):
 
     yk = YahooKeyphrase()
 
-    result = yk.extract(texts[0])
+    result = {}
+    for number in numbers:
+      text = texts[number - 1]
+      if text == "": continue
+
+      keyphrase = yk.extract(text)
+      result[number] = {
+        "text"     : text,
+        "keyphrase": keyphrase,
+      }
 
     json = simplejson.dumps(result, separators=(',',':'))
     if callback != "": json = callback + "(" + json + ")"
