@@ -4,8 +4,7 @@ import urllib
 import urllib2
 from google.appengine.ext import webapp
 
-import json
-from BeautifulSoup import BeautifulSoup
+import simplejson as JSON
 
 
 def read_application_id():
@@ -21,7 +20,7 @@ def create_url_params(app_id, text):
   return {
     "appid"   : app_id,
     "sentence": text.encode("utf-8"),
-    "output"  : "xml",
+    "output"  : "json",
   }
 
 def create_url(app_id, text):
@@ -38,21 +37,15 @@ class ExtractApi(webapp.RequestHandler):
     req = urllib2.Request(url = url)
     io = urllib2.urlopen(req)
     try:
-      xml = io.read()
+      res = io.read()
     finally:
       io.close()
 
-    doc      = BeautifulSoup(xml)
-    results = doc.findAll("result")
-    result = []
-    for item in results:
-      keyphrase = item.find("keyphrase").string.strip()
-      score     = item.find("score").string.strip()
-      result.append((keyphrase, score))
+    result = JSON.loads(res)
 
     callback = ""
-    output = json.write(result)
-    if callback != "":
-      output = callback + "(" + output + ")"
+
+    json = JSON.dumps(result, separators=(',',':'))
+    if callback != "": json = callback + "(" + json + ")"
     self.response.headers["Content-Type"] = "text/javascript"
-    self.response.out.write(output)
+    self.response.out.write(json)
