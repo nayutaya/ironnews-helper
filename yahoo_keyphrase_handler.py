@@ -4,6 +4,10 @@ import urllib
 import urllib2
 from google.appengine.ext import webapp
 
+import json
+from BeautifulSoup import BeautifulSoup
+
+
 def read_application_id():
   f = open("config/yahoo.id")
   app_id = f.readline().strip()
@@ -38,7 +42,17 @@ class ExtractApi(webapp.RequestHandler):
     finally:
       io.close()
 
-    output = xml
-    self.response.headers["Content-Type"] = "text/plain"
-    #self.response.headers["Content-Type"] = "text/javascript"
+    doc      = BeautifulSoup(xml)
+    results = doc.findAll("result")
+    result = []
+    for item in results:
+      keyphrase = item.find("keyphrase").string.strip()
+      score     = item.find("score").string.strip()
+      result.append((keyphrase, score))
+
+    callback = ""
+    output = json.write(result)
+    if callback != "":
+      output = callback + "(" + output + ")"
+    self.response.headers["Content-Type"] = "text/javascript"
     self.response.out.write(output)
