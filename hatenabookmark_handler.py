@@ -59,3 +59,27 @@ class GetTitleApi(webapp.RequestHandler):
       output = callback + "(" + output + ")"
     self.response.headers["Content-Type"] = "text/javascript"
     self.response.out.write(output)
+
+class GetSummaryApi(webapp.RequestHandler):
+  def get(self):
+    numbers  = range(1, 10 + 1)
+    urls     = [self.request.get("url%i" % number) for number in numbers]
+    callback = self.request.get("callback")
+
+    result = {}
+    for number in numbers:
+      url = urls[number - 1]
+      if url == "": continue
+
+      summary = ""
+
+      result[number] = {
+        "url"    : url,
+        "summary": summary,
+      }
+
+    output = json.write(result)
+    if callback != "":
+      output = callback + "(" + output + ")"
+    self.response.headers["Content-Type"] = "text/javascript"
+    self.response.out.write(output)
