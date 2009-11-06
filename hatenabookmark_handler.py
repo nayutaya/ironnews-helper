@@ -60,6 +60,29 @@ class GetTitleApi(webapp.RequestHandler):
     self.response.headers["Content-Type"] = "text/javascript"
     self.response.out.write(output)
 
+import re
+def trim_script_tag(html):
+  pattern = re.compile(r"<script.+?>.*?</script>", re.IGNORECASE | re.DOTALL)
+  return re.sub(pattern, "", html)
+
+import urllib
+import urllib2
+def get_summary(url):
+  entry_url = re.sub(re.compile(r"^http://"), "http://b.hatena.ne.jp/entry/", url)
+  req = urllib2.Request(url = entry_url)
+  req.add_header("User-Agent", "ironnews")
+  io = urllib2.urlopen(req)
+  src = io.read()
+  io.close()
+
+  src = trim_script_tag(src)
+  doc = BeautifulSoup(src)
+
+  summary = doc.find("blockquote", {"id": "entry-extract-content"})
+  summary.find("cite").extract()
+
+  return "".join([elem.string.strip() for elem in summary.findAll(text = True)])
+
 class GetSummaryApi(webapp.RequestHandler):
   def get(self):
     numbers  = range(1, 10 + 1)
@@ -71,7 +94,7 @@ class GetSummaryApi(webapp.RequestHandler):
       url = urls[number - 1]
       if url == "": continue
 
-      summary = ""
+      summary = get_summary(url)
 
       result[number] = {
         "url"    : url,
