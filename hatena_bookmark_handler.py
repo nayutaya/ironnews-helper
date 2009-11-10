@@ -14,20 +14,22 @@ class GetTitleApi(webapp.RequestHandler):
 
   def process(self):
     numbers  = range(1, 10 + 1)
-    urls     = [self.request.get("url%i" % number) for number in numbers]
+    urls     = dict([(number, self.request.get("url%i" % number)) for number in numbers])
     callback = self.request.get("callback")
 
     bookmark_manager = HatenaBookmarkManager()
 
     result = {}
     for number in numbers:
-      url = urls[number - 1]
-      if url != "":
-        title = bookmark_manager.get_title(url)
-        result[number] = {
-          "url"  : url,
-          "title": title,
-        }
+      url = urls[number]
+      if url == "": continue
+
+      title = bookmark_manager.get_title(url)
+
+      result[number] = {
+        "url"  : url,
+        "title": title,
+      }
 
     json = simplejson.dumps(result, separators=(',',':'))
     if callback != "": json = callback + "(" + json + ")"
@@ -43,14 +45,14 @@ class GetSummaryApi(webapp.RequestHandler):
 
   def process(self):
     numbers  = range(1, 10 + 1)
-    urls     = [self.request.get("url%i" % number) for number in numbers]
+    urls     = dict([(number, self.request.get("url%i" % number)) for number in numbers])
     callback = self.request.get("callback")
 
     bookmark_manager = HatenaBookmarkManager()
 
     result = {}
     for number in numbers:
-      url = urls[number - 1]
+      url = urls[number]
       if url == "": continue
 
       summary = bookmark_manager.get_summary(url)
