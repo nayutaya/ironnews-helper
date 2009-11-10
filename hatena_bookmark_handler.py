@@ -5,7 +5,7 @@ import logging
 from google.appengine.ext import webapp
 from google.appengine.api import memcache
 
-import json
+import simplejson
 from BeautifulSoup import BeautifulSoup
 
 from hatenabookmark import HatenaBookmark
@@ -54,11 +54,10 @@ class GetTitleApi(webapp.RequestHandler):
           "title": title,
         }
 
-    output = json.write(result)
-    if callback != "":
-      output = callback + "(" + output + ")"
+    json = simplejson.dumps(result, separators=(',',':'))
+    if callback != "": json = callback + "(" + json + ")"
     self.response.headers["Content-Type"] = "text/javascript"
-    self.response.out.write(output)
+    self.response.out.write(json)
 
 import re
 def trim_script_tag(html):
@@ -101,8 +100,7 @@ class GetSummaryApi(webapp.RequestHandler):
         "summary": summary,
       }
 
-    output = json.write(result)
-    if callback != "":
-      output = callback + "(" + output + ")"
+    json = simplejson.dumps(result, separators=(',',':'))
+    if callback != "": json = callback + "(" + json + ")"
     self.response.headers["Content-Type"] = "text/javascript"
-    self.response.out.write(output)
+    self.response.out.write(json)
