@@ -10,40 +10,39 @@ from hatena_bookmark import HatenaBookmark
 
 class HatenaBookmarkManager:
   def __init__(self):
-    pass
-
-  def get_title(self, url):
-    fetcher = TitleFetcher()
-    return fetcher.fetch_title(url)
-
-  def get_summary(self, url):
-    entry_url = HatenaBookmark.create_entry_url(url)
-    src = HatenaBookmark.fetch_url(entry_url)
-    src = HatenaBookmark.trim_script_tag(src)
-    return HatenaBookmark.extract_summary(src)
-
-class TitleFetcher:
-  def __init__(self):
-    username, password = HatenaBookmark.read_credential()
+    username, password = HatenaBookmarkManager.read_credential()
     self.hatena_bm = HatenaBookmark(username, password)
     self.ttl = 60 * 60
 
-  def fetch_title(self, url):
-    logging.info("get title: " + url)
-    key = self.create_key(url)
+  @classmethod
+  def read_credential(cls):
+    f = open("config/hatena.id")
+    try:
+      username = f.readline().strip()
+      password = f.readline().strip()
+      return (username, password)
+    finally:
+      f.close()
 
-    cache = memcache.get(key)
-    if cache is not None:
-      logging.info("cache hit")
-      return cache
-    else:
+  def get_title(self, url):
+    logging.info("get title: " + url)
+    key   = self.create_title_key(url)
+    value = memcache.get(key)
+
+    if value is None:
       logging.info("cache miss")
       response = self.hatena_bm.post(url)
       xml      = response.read()
       doc      = BeautifulSoup(xml)
-      title    = doc.find("title").string.strip()
-      memcache.add(key, title, self.ttl)
-      return title
+      value    = doc.find("title").string.strip()
+      memcache.add(key, value, self.ttl)
+    else:
+      logging.info("cache hit")
 
-  def create_key(self, url):
+    return value
+
+  def create_title_key(self, url):
     return "hatena_bookmark_title_" + sha.sha(url).hexdigest()
+
+  def get_summary(self, url):
+    return HatenaBookmark.get_summary(url)

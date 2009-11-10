@@ -36,20 +36,19 @@ class HatenaBookmark:
     contents = [elem.string.strip() for elem in summary.findAll(text = True)]
     return "".join(contents)
 
+  @classmethod
+  def get_summary(cls, url):
+    entry_url = cls.create_entry_url(url)
+    src1 = cls.fetch_url(entry_url)
+    src2 = cls.trim_script_tag(src1)
+    return cls.extract_summary(src2)
+
 
 
 
   def __init__(self, username, password):
     self.username = username
     self.password = password
-
-  @classmethod
-  def read_credential(cls):
-    f = open("config/hatena.id")
-    username = f.readline().strip()
-    password = f.readline().strip()
-    f.close()
-    return (username, password)
 
   def create_http_header(self):
     return {
