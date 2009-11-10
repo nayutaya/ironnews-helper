@@ -38,4 +38,18 @@ class HatenaBookmarkManager:
     return "hatena_bookmark_title_" + sha.sha(url).hexdigest()
 
   def get_summary(self, url):
-    return HatenaBookmark.get_summary(url)
+    logging.info("get summary " + url)
+    key = self.create_summary_key(url)
+    value = memcache.get(key)
+
+    if value is None:
+      logging.info("cache miss")
+      value = HatenaBookmark.get_summary(url)
+      memcache.add(key, value, self.ttl)
+    else:
+      logging.info("cache hit")
+
+    return value
+
+  def create_summary_key(self, url):
+    return "hatena_bookmark_summary_" + sha.sha(url).hexdigest()
