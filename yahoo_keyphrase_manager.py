@@ -7,9 +7,13 @@ from yahoo_keyphrase import YahooKeyphrase
 
 class YahooKeyphraseManager:
   def __init__(self):
+    self.app_id = self.read_api_id()
+    self.ttl    = 60 * 60 # seconds
+
+  def read_api_id(self):
     f = open("config/yahoo.id")
     try:
-      self.app_id = f.readline().strip()
+      return f.readline().strip()
     finally:
       f.close()
 
@@ -21,5 +25,5 @@ class YahooKeyphraseManager:
     value = memcache.get(key)
     if value is None:
       value = YahooKeyphrase.extract(self.app_id, text)
-      memcache.add(key, value, 60 * 60)
+      memcache.add(key, value, self.ttl)
     return value
