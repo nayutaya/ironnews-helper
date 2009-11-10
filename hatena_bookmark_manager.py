@@ -13,8 +13,6 @@ class HatenaBookmarkManager:
     self.username, self.password = self.read_credential()
     self.ttl = 60 * 60
 
-    self.hatena_bm = HatenaBookmark(self.username, self.password)
-
   def read_credential(self):
     f = open("config/hatena.id")
     try:
@@ -31,7 +29,7 @@ class HatenaBookmarkManager:
 
     if value is None:
       logging.info("cache miss")
-      response = self.hatena_bm.post(url)
+      response = HatenaBookmark.post(url, self.username, self.password)
       xml      = response.read()
       doc      = BeautifulSoup(xml)
       value    = doc.find("title").string.strip()

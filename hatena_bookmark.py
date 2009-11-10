@@ -9,7 +9,6 @@ import sha
 import time
 import random
 import datetime
-
 from BeautifulSoup import BeautifulSoup
 
 class HatenaBookmark:
@@ -47,52 +46,52 @@ class HatenaBookmark:
     src2 = cls.trim_script_tag(src1)
     return cls.extract_summary(src2)
 
-
-  def create_wsse_created(self):
+  @classmethod
+  def create_wsse_created(cls):
     return datetime.datetime.now().isoformat() + "Z"
 
-  def create_wsse_nonce(self):
+  @classmethod
+  def create_wsse_nonce(cls):
     return base64.b64encode(sha.sha(str(time.time() + random.random())).digest())
 
-  def create_wsse_digest(self, password, nonce, created):
+  @classmethod
+  def create_wsse_digest(cls, password, nonce, created):
     return base64.b64encode(sha.sha(nonce + created + password).digest())
 
-  def format_wsse_token(self, username, digest, nonce, created):
+  @classmethod
+  def format_wsse_token(cls, username, digest, nonce, created):
     format = 'UsernameToken Username="%(u)s", PasswordDigest="%(p)s", Nonce="%(n)s", Created="%(c)s"'
     value  = dict(u = username, p = digest, n = nonce, c = created)
     return format % value
 
-  def create_wsse_token(self, username, password):
-    created = self.create_wsse_created()
-    nonce   = self.create_wsse_nonce()
-    digest  = self.create_wsse_digest(password, nonce, created)
-    return self.format_wsse_token(username, digest, nonce, created)
+  @classmethod
+  def create_wsse_token(cls, username, password):
+    created = cls.create_wsse_created()
+    nonce   = cls.create_wsse_nonce()
+    digest  = cls.create_wsse_digest(password, nonce, created)
+    return cls.format_wsse_token(username, digest, nonce, created)
 
-
-
-
-  def __init__(self, username, password):
-    self.username = username
-    self.password = password
-
-  def create_http_header(self):
+  @classmethod
+  def create_http_header(cls, username, password):
     return {
       "Content-Type": "text/xml",
       #"User-Agent"  : "ironnews",
       "User-Agent"  : "hoge",
-      "X-WSSE"      : self.create_wsse_token(self.username, self.password),
+      "X-WSSE"      : cls.create_wsse_token(username, password),
     }
 
-  def create_post_request_xml(self, url):
+  @classmethod
+  def create_post_request_xml(cls, url):
     return (
       '<entry xmlns="http://purl.org/atom/ns#">'
       '<title>title</title>'
       '<link rel="related" type="text/html" href="') + url + ('" />'
       '</entry>')
 
-  def post(self, url):
-    header  = self.create_http_header()
-    request = self.create_post_request_xml(url)
+  @classmethod
+  def post(cls, url, username, password):
+    header  = cls.create_http_header(username, password)
+    request = cls.create_post_request_xml(url)
     connection = httplib.HTTPConnection("b.hatena.ne.jp")
     connection.request("POST", "/atom/post", request, header)
     return connection.getresponse()
