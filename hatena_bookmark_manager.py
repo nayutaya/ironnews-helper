@@ -10,6 +10,36 @@ from BeautifulSoup import BeautifulSoup
 
 from hatenabookmark import HatenaBookmark
 
+def trim_script_tag(html):
+  pattern = re.compile(r"<script.+?>.*?</script>", re.IGNORECASE | re.DOTALL)
+  return re.sub(pattern, "", html)
+
+def get_summary(url):
+  entry_url = re.sub(re.compile(r"^http://"), "http://b.hatena.ne.jp/entry/", url)
+  req = urllib2.Request(url = entry_url)
+  req.add_header("User-Agent", "ironnews")
+  io = urllib2.urlopen(req)
+  src = io.read()
+  io.close()
+
+  src = trim_script_tag(src)
+  doc = BeautifulSoup(src)
+
+  summary = doc.find("blockquote", {"id": "entry-extract-content"})
+  summary.find("cite").extract()
+
+  return "".join([elem.string.strip() for elem in summary.findAll(text = True)])
+
+class HatenaBookmarkManager:
+  def __init__(self):
+    pass
+
+  def get_title(self, url):
+    fetcher = TitleFetcher()
+    return fetcher.fetch_title(url)
+
+  def get_summary(self, url):
+    return get_summary(url)
 
 class TitleFetcher:
   def __init__(self):
@@ -35,23 +65,3 @@ class TitleFetcher:
 
   def create_key(self, url):
     return "hatena_bookmark_title_" + sha.sha(url).hexdigest()
-
-def trim_script_tag(html):
-  pattern = re.compile(r"<script.+?>.*?</script>", re.IGNORECASE | re.DOTALL)
-  return re.sub(pattern, "", html)
-
-def get_summary(url):
-  entry_url = re.sub(re.compile(r"^http://"), "http://b.hatena.ne.jp/entry/", url)
-  req = urllib2.Request(url = entry_url)
-  req.add_header("User-Agent", "ironnews")
-  io = urllib2.urlopen(req)
-  src = io.read()
-  io.close()
-
-  src = trim_script_tag(src)
-  doc = BeautifulSoup(src)
-
-  summary = doc.find("blockquote", {"id": "entry-extract-content"})
-  summary.find("cite").extract()
-
-  return "".join([elem.string.strip() for elem in summary.findAll(text = True)])

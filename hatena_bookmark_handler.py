@@ -3,8 +3,7 @@
 import simplejson
 from google.appengine.ext import webapp
 
-from hatena_bookmark_manager import TitleFetcher
-from hatena_bookmark_manager import get_summary
+from hatena_bookmark_manager import HatenaBookmarkManager
 
 class GetTitleApi(webapp.RequestHandler):
   def get(self):
@@ -18,13 +17,13 @@ class GetTitleApi(webapp.RequestHandler):
     urls     = [self.request.get("url%i" % number) for number in numbers]
     callback = self.request.get("callback")
 
-    fetcher = TitleFetcher()
+    bookmark_manager = HatenaBookmarkManager()
 
     result = {}
     for number in numbers:
       url = urls[number - 1]
       if url != "":
-        title = fetcher.fetch_title(url)
+        title = bookmark_manager.get_title(url)
         result[number] = {
           "url"  : url,
           "title": title,
@@ -47,12 +46,14 @@ class GetSummaryApi(webapp.RequestHandler):
     urls     = [self.request.get("url%i" % number) for number in numbers]
     callback = self.request.get("callback")
 
+    bookmark_manager = HatenaBookmarkManager()
+
     result = {}
     for number in numbers:
       url = urls[number - 1]
       if url == "": continue
 
-      summary = get_summary(url)
+      summary = bookmark_manager.get_summary(url)
 
       result[number] = {
         "url"    : url,
