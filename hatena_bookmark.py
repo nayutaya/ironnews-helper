@@ -3,13 +3,19 @@
 import re
 import urllib
 import urllib2
-import httplib
 import base64
 import sha
 import time
 import random
 import datetime
 from BeautifulSoup import BeautifulSoup
+
+class MyHTTPErrorProcessor(urllib2.HTTPErrorProcessor):
+  def http_response(self, request, response):
+    code, msg, hdrs = response.code, response.msg, response.info()
+    if code not in (200, 201):
+      response = self.parent.error("http", request, response, code, msg, hdrs)
+    return response
 
 class HatenaBookmark:
   @classmethod
@@ -90,8 +96,19 @@ class HatenaBookmark:
 
   @classmethod
   def post(cls, url, username, password):
-    header  = cls.create_http_header(username, password)
-    request = cls.create_post_request_xml(url)
-    connection = httplib.HTTPConnection("b.hatena.ne.jp")
-    connection.request("POST", "/atom/post", request, header)
-    return connection.getresponse()
+    atom_url = "http://b.hatena.ne.jp/atom/post"
+    data = cls.create_post_request_xml(url)
+
+    request = urllib2.Request(url = atom_url, data = data)
+    request.add_header("Content-Type", "text/xml")
+    request.add_header("User-Agent", "ironnews")
+    request.add_header("X-WSSE", cls.create_wsse_token(username, password))
+
+    opener = urllib2.build_opener(MyHTTPErrorProcessor)
+    urllib2.install_opener(opener)
+
+    io = urllib2.urlopen(request)
+    try:
+      return io.read()
+    finally:
+      io.close()

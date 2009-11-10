@@ -29,8 +29,7 @@ class HatenaBookmarkManager:
 
     if value is None:
       logging.info("cache miss")
-      response = HatenaBookmark.post(url, self.username, self.password)
-      xml      = response.read()
+      xml      = HatenaBookmark.post(url, self.username, self.password)
       doc      = BeautifulSoup(xml)
       value    = doc.find("title").string.strip()
       memcache.add(key, value, self.ttl)
