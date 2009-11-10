@@ -6,7 +6,7 @@ require "net/http"
 require "rubygems"
 require "json"
 
-class HatenaTest < Test::Unit::TestCase
+class HatenaBookmarkTest < Test::Unit::TestCase
   def setup
     @host = "localhost"
     @port = 8080
