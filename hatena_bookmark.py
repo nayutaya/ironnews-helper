@@ -4,9 +4,13 @@ import re
 import urllib
 import urllib2
 import httplib
-from BeautifulSoup import BeautifulSoup
+import base64
+import sha
+import time
+import random
+import datetime
 
-from wsse import WSSE
+from BeautifulSoup import BeautifulSoup
 
 class HatenaBookmark:
   @classmethod
@@ -44,6 +48,27 @@ class HatenaBookmark:
     return cls.extract_summary(src2)
 
 
+  def create_wsse_created(self):
+    return datetime.datetime.now().isoformat() + "Z"
+
+  def create_wsse_nonce(self):
+    return base64.b64encode(sha.sha(str(time.time() + random.random())).digest())
+
+  def create_wsse_digest(self, password, nonce, created):
+    return base64.b64encode(sha.sha(nonce + created + password).digest())
+
+  def format_wsse_token(self, username, digest, nonce, created):
+    format = 'UsernameToken Username="%(u)s", PasswordDigest="%(p)s", Nonce="%(n)s", Created="%(c)s"'
+    value  = dict(u = username, p = digest, n = nonce, c = created)
+    return format % value
+
+  def create_wsse_token(self, username, password):
+    created = self.create_wsse_created()
+    nonce   = self.create_wsse_nonce()
+    digest  = self.create_wsse_digest(password, nonce, created)
+    return self.format_wsse_token(username, digest, nonce, created)
+
+
 
 
   def __init__(self, username, password):
@@ -55,7 +80,7 @@ class HatenaBookmark:
       "Content-Type": "text/xml",
       #"User-Agent"  : "ironnews",
       "User-Agent"  : "hoge",
-      "X-WSSE"      : WSSE.create_token(self.username, self.password),
+      "X-WSSE"      : self.create_wsse_token(self.username, self.password),
     }
 
   def create_post_request_xml(self, url):

@@ -10,12 +10,12 @@ from hatena_bookmark import HatenaBookmark
 
 class HatenaBookmarkManager:
   def __init__(self):
-    username, password = HatenaBookmarkManager.read_credential()
-    self.hatena_bm = HatenaBookmark(username, password)
+    self.username, self.password = self.read_credential()
     self.ttl = 60 * 60
 
-  @classmethod
-  def read_credential(cls):
+    self.hatena_bm = HatenaBookmark(self.username, self.password)
+
+  def read_credential(self):
     f = open("config/hatena.id")
     try:
       username = f.readline().strip()
