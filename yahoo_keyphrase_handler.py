@@ -29,6 +29,12 @@ class YahooKeyphrase:
 
 class ExtractApi(webapp.RequestHandler):
   def get(self):
+    self.process()
+
+  def post(self):
+    self.process()
+
+  def process(self):
     numbers  = range(1, 10 + 1)
     texts    = [self.request.get("text%i" % number) for number in numbers]
     callback = self.request.get("callback")
