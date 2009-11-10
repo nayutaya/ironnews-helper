@@ -89,6 +89,12 @@ def get_summary(url):
 
 class GetSummaryApi(webapp.RequestHandler):
   def get(self):
+    self.process()
+
+  def post(self):
+    self.process()
+
+  def process(self):
     numbers  = range(1, 10 + 1)
     urls     = [self.request.get("url%i" % number) for number in numbers]
     callback = self.request.get("callback")
