@@ -17,7 +17,7 @@ class HatenaTest < Test::Unit::TestCase
   def test_get_title__1__by_get
     data = "url1=" + CGI.escape("http://www.asahi.com/international/update/1110/TKY200911100249.html")
 
-    response = http_get(@get_title_path + "?" + data)
+    response = http_get(@get_title_path, data)
     assert_equal(200, response.code.to_i)
 
     expected = {
@@ -109,7 +109,7 @@ class HatenaTest < Test::Unit::TestCase
   def test_get_summary__1__by_get
     data = "url1=" + CGI.escape("http://www.asahi.com/international/update/1110/TKY200911100249.html")
 
-    response = http_get(@get_summary_path + "?" + data)
+    response = http_get(@get_summary_path, data)
     assert_equal(200, response.code.to_i)
 
     expected = {
@@ -123,7 +123,8 @@ class HatenaTest < Test::Unit::TestCase
 
   private
 
-  def http_get(path)
+  def http_get(path, data = nil)
+    path += "?" + data if data
     Net::HTTP.start(@host, @port) { |http|
       return http.get(path)
     }
