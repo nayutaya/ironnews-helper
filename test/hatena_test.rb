@@ -3,6 +3,8 @@
 require "test/unit"
 require "cgi"
 require "net/http"
+require "rubygems"
+require "json"
 
 class HatenaTest < Test::Unit::TestCase
   def setup
@@ -10,13 +12,20 @@ class HatenaTest < Test::Unit::TestCase
     @port = 8080
   end
 
-  def test_get_title__by_get
-    target_url   = "http://www.asahi.com/international/update/1110/TKY200911100249.html"
-    service_path = "/hatena-bookmark/get-title?url0=" + CGI.escape(target_url)
+  def test_get_title__1__by_get
+    path = "/hatena-bookmark/get-title"
+    data = "url1=" + CGI.escape("http://www.asahi.com/international/update/1110/TKY200911100249.html")
 
-    response = http_get(service_path)
-p response.code
-p response.body
+    response = http_get(path + "?" + data)
+    assert_equal(200, response.code.to_i)
+
+    expected = {
+      "1" => {
+        "url"   => "http://www.asahi.com/international/update/1110/TKY200911100249.html",
+        "title" => "asahi.com（朝日新聞社）：韓国と北朝鮮の海軍、黄海で一時交戦　聯合ニュース報道 - 国際",
+      }
+    }
+    assert_equal(expected, JSON.parse(response.body))
   end
 
   private
