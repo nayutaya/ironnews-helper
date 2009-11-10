@@ -2,9 +2,7 @@
 
 import sha
 import logging
-import re
 from google.appengine.api import memcache
-from BeautifulSoup import BeautifulSoup
 
 from hatena_bookmark import HatenaBookmark
 
@@ -29,9 +27,7 @@ class HatenaBookmarkManager:
 
     if value is None:
       logging.info("cache miss")
-      xml      = HatenaBookmark.post(url, self.username, self.password)
-      doc      = BeautifulSoup(xml)
-      value    = doc.find("title").string.strip()
+      value = HatenaBookmark.get_title(url, self.username, self.password)
       memcache.add(key, value, self.ttl)
     else:
       logging.info("cache hit")

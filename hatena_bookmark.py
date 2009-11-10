@@ -112,3 +112,10 @@ class HatenaBookmark:
       return io.read()
     finally:
       io.close()
+
+  @classmethod
+  def get_title(cls, url, username, password):
+    xml   = cls.post(url, username, password)
+    doc   = BeautifulSoup(xml)
+    title = doc.find("title").string.strip()
+    return title
