@@ -10,13 +10,13 @@ class HatenaTest < Test::Unit::TestCase
   def setup
     @host = "localhost"
     @port = 8080
+    @get_title_path = "/hatena-bookmark/get-title"
   end
 
   def test_get_title__1__by_get
-    path = "/hatena-bookmark/get-title"
     data = "url1=" + CGI.escape("http://www.asahi.com/international/update/1110/TKY200911100249.html")
 
-    response = http_get(path + "?" + data)
+    response = http_get(@get_title_path + "?" + data)
     assert_equal(200, response.code.to_i)
 
     expected = {
@@ -29,10 +29,9 @@ class HatenaTest < Test::Unit::TestCase
   end
 
   def test_get_title__1__by_post
-    path = "/hatena-bookmark/get-title"
     data = "url1=" + CGI.escape("http://www.asahi.com/national/update/1110/SEB200911100003.html")
 
-    response = http_post(path, data)
+    response = http_post(@get_title_path, data)
     assert_equal(200, response.code.to_i)
 
     expected = {
@@ -57,9 +56,8 @@ class HatenaTest < Test::Unit::TestCase
       "http://www.asahi.com/politics/update/1110/TKY200911100262.html",
       "http://www.asahi.com/national/update/1110/TKY200911100205.html",
     ].to_enum(:each_with_index).map { |url, index| "url#{index + 1}=" + CGI.escape(url) }.join("&")
-    path = "/hatena-bookmark/get-title"
 
-    response = http_post(path, data)
+    response = http_post(@get_title_path, data)
     assert_equal(200, response.code.to_i)
 
     expected = {
