@@ -4,7 +4,7 @@ import urllib
 import urllib2
 import simplejson
 
-class Keyphrase:
+class YahooKeyphrase:
   @classmethod
   def create_base_url(cls):
     return "http://jlp.yahooapis.jp/KeyphraseService/V1/extract"
