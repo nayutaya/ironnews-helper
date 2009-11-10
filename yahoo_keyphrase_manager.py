@@ -3,7 +3,7 @@
 import sha
 from google.appengine.api import memcache
 
-import yahoo
+from yahoo_keyphrase import YahooKeyphrase
 
 class YahooKeyphraseManager:
   def __init__(self):
@@ -20,6 +20,6 @@ class YahooKeyphraseManager:
     key   = self.create_key(text)
     value = memcache.get(key)
     if value is None:
-      value = yahoo.Keyphrase.extract(self.app_id, text)
+      value = YahooKeyphrase.extract(self.app_id, text)
       memcache.add(key, value, 60 * 60)
     return value
