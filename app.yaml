@@ -1,6 +1,6 @@
 
 application: ironnews-helper2
-version: v2
+version: v3
 runtime: python
 api_version: 1
 
