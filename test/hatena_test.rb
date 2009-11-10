@@ -10,7 +10,8 @@ class HatenaTest < Test::Unit::TestCase
   def setup
     @host = "localhost"
     @port = 8080
-    @get_title_path = "/hatena-bookmark/get-title"
+    @get_title_path   = "/hatena-bookmark/get-title"
+    @get_summary_path = "/hatena-bookmark/get-summary"
   end
 
   def test_get_title__1__by_get
@@ -100,6 +101,21 @@ class HatenaTest < Test::Unit::TestCase
       "10" => {
         "url"   => "http://www.asahi.com/national/update/1110/TKY200911100205.html",
         "title" => "asahi.com（朝日新聞社）：中央線が再開　阿佐ケ谷で人身事故、一時運転見合わせ - 社会",
+      },
+    }
+    assert_equal(expected, JSON.parse(response.body))
+  end
+
+  def test_get_summary__1__by_get
+    data = "url1=" + CGI.escape("http://www.asahi.com/international/update/1110/TKY200911100249.html")
+
+    response = http_get(@get_summary_path + "?" + data)
+    assert_equal(200, response.code.to_i)
+
+    expected = {
+      "1" => {
+        "url"     => "http://www.asahi.com/international/update/1110/TKY200911100249.html",
+        "summary" => "【ソウル＝箱田哲也】韓国の聯合ニュースは１０日、朝鮮半島西方の黄海で同日午前、韓国と北朝鮮の海軍が一時的に交戦状態になった、と伝えた。韓国側の死傷者については明らかになっていない。",
       },
     }
     assert_equal(expected, JSON.parse(response.body))
