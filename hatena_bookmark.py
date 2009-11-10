@@ -1,10 +1,44 @@
 # -*- coding: utf-8 -*-
 
+import re
+import urllib
+import urllib2
 import httplib
+from BeautifulSoup import BeautifulSoup
 
 from wsse import WSSE
 
 class HatenaBookmark:
+  @classmethod
+  def create_entry_url(cls, url):
+    return re.sub(re.compile(r"^http://"), "http://b.hatena.ne.jp/entry/", url)
+
+  @classmethod
+  def fetch_url(cls, url):
+    request = urllib2.Request(url = url)
+    request.add_header("User-Agent", "ironnews")
+    io = urllib2.urlopen(request)
+    try:
+      return io.read()
+    finally:
+      io.close()
+
+  @classmethod
+  def trim_script_tag(cls, html):
+    pattern = re.compile(r"<script.+?>.*?</script>", re.IGNORECASE | re.DOTALL)
+    return re.sub(pattern, "", html)
+
+  @classmethod
+  def extract_summary(cls, html):
+    doc = BeautifulSoup(html)
+    summary = doc.find("blockquote", {"id": "entry-extract-content"})
+    summary.find("cite").extract()
+    contents = [elem.string.strip() for elem in summary.findAll(text = True)]
+    return "".join(contents)
+
+
+
+
   def __init__(self, username, password):
     self.username = username
     self.password = password

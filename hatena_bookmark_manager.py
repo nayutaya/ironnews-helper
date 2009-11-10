@@ -3,32 +3,10 @@
 import sha
 import logging
 import re
-import urllib
-import urllib2
 from google.appengine.api import memcache
 from BeautifulSoup import BeautifulSoup
 
-from hatenabookmark import HatenaBookmark
-
-def trim_script_tag(html):
-  pattern = re.compile(r"<script.+?>.*?</script>", re.IGNORECASE | re.DOTALL)
-  return re.sub(pattern, "", html)
-
-def get_summary(url):
-  entry_url = re.sub(re.compile(r"^http://"), "http://b.hatena.ne.jp/entry/", url)
-  req = urllib2.Request(url = entry_url)
-  req.add_header("User-Agent", "ironnews")
-  io = urllib2.urlopen(req)
-  src = io.read()
-  io.close()
-
-  src = trim_script_tag(src)
-  doc = BeautifulSoup(src)
-
-  summary = doc.find("blockquote", {"id": "entry-extract-content"})
-  summary.find("cite").extract()
-
-  return "".join([elem.string.strip() for elem in summary.findAll(text = True)])
+from hatena_bookmark import HatenaBookmark
 
 class HatenaBookmarkManager:
   def __init__(self):
@@ -39,12 +17,16 @@ class HatenaBookmarkManager:
     return fetcher.fetch_title(url)
 
   def get_summary(self, url):
-    return get_summary(url)
+    entry_url = HatenaBookmark.create_entry_url(url)
+    src = HatenaBookmark.fetch_url(entry_url)
+    src = HatenaBookmark.trim_script_tag(src)
+    return HatenaBookmark.extract_summary(src)
 
 class TitleFetcher:
   def __init__(self):
     username, password = HatenaBookmark.read_credential()
     self.hatena_bm = HatenaBookmark(username, password)
+    self.ttl = 60 * 60
 
   def fetch_title(self, url):
     logging.info("get title: " + url)
@@ -60,7 +42,7 @@ class TitleFetcher:
       xml      = response.read()
       doc      = BeautifulSoup(xml)
       title    = doc.find("title").string.strip()
-      memcache.add(key, title, 60 * 60)
+      memcache.add(key, title, self.ttl)
       return title
 
   def create_key(self, url):
