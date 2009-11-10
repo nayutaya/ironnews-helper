@@ -18,7 +18,6 @@ class TitleFetcher:
   def fetch_title(self, url):
     logging.info("get title: " + url)
     key = self.create_key(url)
-    logging.info("key: " + key)
 
     cache = memcache.get(key)
     if cache is not None:
@@ -38,6 +37,12 @@ class TitleFetcher:
 
 class GetTitleApi(webapp.RequestHandler):
   def get(self):
+    self.process()
+
+  def post(self):
+    self.process()
+
+  def process(self):
     numbers  = range(1, 10 + 1)
     urls     = [self.request.get("url%i" % number) for number in numbers]
     callback = self.request.get("callback")

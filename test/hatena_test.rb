@@ -28,6 +28,22 @@ class HatenaTest < Test::Unit::TestCase
     assert_equal(expected, JSON.parse(response.body))
   end
 
+  def test_get_title__1__by_post
+    path = "/hatena-bookmark/get-title"
+    data = "url1=" + CGI.escape("http://www.asahi.com/national/update/1110/SEB200911100003.html")
+
+    response = http_post(path, data)
+    assert_equal(200, response.code.to_i)
+
+    expected = {
+      "1" => {
+        "url"   => "http://www.asahi.com/national/update/1110/SEB200911100003.html",
+        "title" => "asahi.com（朝日新聞社）：沖縄のひき逃げ事件、米側が陸軍兵の身柄を確保 - 社会",
+      }
+    }
+    assert_equal(expected, JSON.parse(response.body))
+  end
+
   private
 
   def http_get(path)
