@@ -8,7 +8,7 @@ from yahoo_keyphrase import YahooKeyphrase
 class YahooKeyphraseManager:
   def __init__(self):
     self.app_id = self.read_api_id()
-    self.ttl    = 60 * 60 # seconds
+    self.ttl    = 60 * 60 * 24 # 1 day
 
   def read_api_id(self):
     f = open("config/yahoo.id")
