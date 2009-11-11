@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import sys
-sys.path.append("lib")
+if __name__ == "__main__":
+  import sys
+  sys.path.append("lib")
 
 import urllib
 import urllib2
@@ -64,8 +65,9 @@ class GoogleNews:
     return items
 
 
-items = GoogleNews.search(u"鉄道", 20)
-
-for item in items:
-  print item["url"]
-  print item["title"]
+if __name__ == "__main__":
+  items = GoogleNews.search(u"鉄道", 20)
+  for item in items:
+    print "---"
+    print item["url"]
+    print item["title"]
