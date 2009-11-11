@@ -3,11 +3,21 @@
  <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>ironnews-helper</title>
+  <style type="text/css">
+    .memcache-stats th
+    {
+      text-align: left;
+    }
+    .memcache-stats td
+    {
+      text-align: right;
+    }
+  </style>
  </head>
  <body>
   <h1>ironnews-helper</h1>
-  <h2>memcache status</h2>
-   <table>
+  <h2>memcache stats</h2>
+   <table class="memcache-stats">
     <tr>
      <th>キャッシュヒット率</th>
      <td>{{ratio}} %</td>
