@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import sys
+sys.path.append("lib")
+
 import urllib
 import urllib2
+import re
+from BeautifulSoup import BeautifulSoup
 
 class GoogleNews:
   @classmethod
@@ -32,33 +37,35 @@ class GoogleNews:
     finally:
       io.close()
 
-src = GoogleNews.fetch_rss(u"鉄道", 20)
-#print src
+  @classmethod
+  def parse_rss(cls, rss):
+    pattern  = re.compile(r"cluster=(.+?)$")
+    document = BeautifulSoup(rss)
 
-f = open("out.xml", "w")
-f.write(src)
-f.close()
+    result = []
+    items = document.findAll("item")
+    for item in items:
+      title = item.find("title").string
+      guid  = item.find("guid").string
 
-import sys
-sys.path.append("lib")
+      match = re.search(pattern, guid)
+      url   = match.group(1).replace("&amp;", "&")
+      result.append({
+        "title": title,
+        "url"  : url,
+      })
 
-from BeautifulSoup import BeautifulSoup
+    return result
 
-document = BeautifulSoup(src)
-items = document.findAll("item")
+  @classmethod
+  def search(cls, keyword, num):
+    rss   = GoogleNews.fetch_rss(keyword, num)
+    items = GoogleNews.parse_rss(rss)
+    return items
 
-import re
 
-pattern = re.compile(r"cluster=(.+?)$")
+items = GoogleNews.search(u"鉄道", 20)
 
 for item in items:
-  title = item.find("title").string
-  guid  = item.find("guid").string
-
-  print "---"
-  #print item
-  print title
-  #print guid
-
-  match = re.search(pattern, guid)
-  print match.group(1)
+  print item["url"]
+  print item["title"]
