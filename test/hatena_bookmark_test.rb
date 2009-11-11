@@ -8,8 +8,14 @@ require "json"
 
 class HatenaBookmarkTest < Test::Unit::TestCase
   def setup
-    @host = "localhost"
-    @port = 8080
+    if true
+      @host = "localhost"
+      @port = 8080
+    else
+      @host = "v3.latest.ironnews-helper2.appspot.com"
+      @port = 80
+    end
+
     @get_title_path   = "/hatena-bookmark/get-title"
     @get_summary_path = "/hatena-bookmark/get-summary"
   end
