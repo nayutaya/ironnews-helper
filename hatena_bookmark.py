@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+#import sys
+#sys.path.append("lib")
+
 import re
 import urllib
 import urllib2
@@ -43,6 +46,13 @@ class HatenaBookmark:
     summary = doc.find("blockquote", {"id": "entry-extract-content"})
     summary.find("cite").extract()
     contents = [elem.string.strip() for elem in summary.findAll(text = True)]
+    return "".join(contents)
+
+  @classmethod
+  def extract_title(cls, html):
+    document = BeautifulSoup(html)
+    title    = document.find("a", {"id": "head-entry-link"})
+    contents = [elem.string.strip() for elem in title.findAll(text = True)]
     return "".join(contents)
 
   @classmethod
@@ -119,3 +129,17 @@ class HatenaBookmark:
     doc   = BeautifulSoup(xml)
     title = doc.find("title").string.strip()
     return title
+
+"""
+url = "http://www.asahi.com/national/update/0314/NGY200903140002.html"
+entry_url = HatenaBookmark.create_entry_url(url)
+src1 = HatenaBookmark.fetch_url(entry_url)
+src2 = HatenaBookmark.trim_script_tag(src1)
+
+f = open("out.html", "w")
+f.write(src2)
+f.close()
+
+print HatenaBookmark.extract_title(src2)
+#return HatenaBookmark.extract_summary(src2)
+"""
