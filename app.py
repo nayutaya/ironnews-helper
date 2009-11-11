@@ -10,9 +10,14 @@ import hatena_bookmark_handler
 import yahoo_keyphrase_handler
 import google_news_handler
 
+class HomePage(webapp.RequestHandler):
+  def get(self):
+    self.response.out.write("hello")
+
 if __name__ == "__main__":
   application = webapp.WSGIApplication(
     [
+      (r"/",                            HomePage),
       (r"/hatena-bookmark/get-title",   hatena_bookmark_handler.GetTitleApi),
       (r"/hatena-bookmark/get-summary", hatena_bookmark_handler.GetSummaryApi),
       (r"/yahoo-keyphrase/extract",     yahoo_keyphrase_handler.ExtractApi),
