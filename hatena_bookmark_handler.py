@@ -55,11 +55,12 @@ class GetSummaryApi(webapp.RequestHandler):
       url = urls[number]
       if url == "": continue
 
-      summary = bookmark_manager.get_summary(url)
+      title, summary = bookmark_manager.get_summary(url)
 
       result[number] = {
         "url"    : url,
-        "summary": summary[1],
+        "title"  : title,
+        "summary": summary,
       }
 
     json = simplejson.dumps(result, separators=(',',':'))
