@@ -38,9 +38,20 @@ class HatenaBookmark:
     return re.sub(pattern, "", html)
 
   @classmethod
-  def extract_summary(cls, html):
-    doc = BeautifulSoup(html)
-    summary = doc.find("blockquote", {"id": "entry-extract-content"})
+  def is_bookmarked(cls, document):
+    span = document.find("span", {"class": "entry-notfound-blockquote"})
+    return (span is None)
+
+  @classmethod
+  def extract_title(cls, document):
+    title    = document.find("a", {"id": "head-entry-link"})
+    contents = [elem.string.strip() for elem in title.findAll(text = True)]
+    return "".join(contents)
+
+  @classmethod
+  def extract_summary(cls, document):
+    summary = document.find("blockquote", {"id": "entry-extract-content"})
+    if summary is None: return None
     summary.find("cite").extract()
     contents = [elem.string.strip() for elem in summary.findAll(text = True)]
     return "".join(contents)
@@ -50,7 +61,13 @@ class HatenaBookmark:
     entry_url = cls.create_entry_url(url)
     src1 = cls.fetch_url(entry_url)
     src2 = cls.trim_script_tag(src1)
-    return cls.extract_summary(src2)
+    document = BeautifulSoup(src2)
+    if cls.is_bookmarked(document):
+      title    = cls.extract_title(document)
+      summary  = cls.extract_summary(document)
+      return (title, summary)
+    else:
+      return (None, None)
 
   @classmethod
   def create_wsse_created(cls):
@@ -115,7 +132,10 @@ class HatenaBookmark:
 
   @classmethod
   def get_title(cls, url, username, password):
-    xml   = cls.post(url, username, password)
-    doc   = BeautifulSoup(xml)
-    title = doc.find("title").string.strip()
+    title, summary = cls.get_summary(url)
+    if title is not None: return title
+
+    xml      = cls.post(url, username, password)
+    document = BeautifulSoup(xml)
+    title    = document.find("title").string.strip()
     return title
