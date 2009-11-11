@@ -18,14 +18,8 @@ class YahooKeyphrase:
     }
 
   @classmethod
-  def create_url(cls, app_id, text):
-    base   = cls.create_base_url()
-    params = cls.create_url_params(app_id, text)
-    return base + "?" + urllib.urlencode(params)
-
-  @classmethod
-  def read_url(cls, url):
-    io = urllib2.urlopen(url)
+  def read_url(cls, url, data):
+    io = urllib2.urlopen(url, data)
     try:
       return io.read()
     finally:
@@ -33,7 +27,8 @@ class YahooKeyphrase:
 
   @classmethod
   def extract(cls, app_id, text):
-    url  = cls.create_url(app_id, text)
-    json = cls.read_url(url)
+    url    = cls.create_base_url()
+    params = cls.create_url_params(app_id, text)
+    json = cls.read_url(url, urllib.urlencode(params))
     obj  = simplejson.loads(json)
     return obj
