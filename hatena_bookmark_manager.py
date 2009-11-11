@@ -28,7 +28,7 @@ class HatenaBookmarkManager:
     key   = self.create_title_key(url)
     value = memcache.get(key)
     if value is None:
-      # MEMO: 1“x‚¾‚¯Äs‚·‚é
+      # MEMO: 1åº¦ã ã‘å†è©¦è¡Œã™ã‚‹
       try:
         value = HatenaBookmark.get_title(url, self.username, self.password)
       except urlfetch.DownloadError:
@@ -44,7 +44,7 @@ class HatenaBookmarkManager:
     key   = self.create_summary_key(url)
     value = memcache.get(key)
     if value is None:
-      # MEMO: 1“x‚¾‚¯Äs‚·‚é
+      # MEMO: 1åº¦ã ã‘å†è©¦è¡Œã™ã‚‹
       try:
         value = HatenaBookmark.get_summary(url)
       except urlfetch.DownloadError:

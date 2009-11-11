@@ -2,6 +2,7 @@
 
 import sha
 from google.appengine.api import memcache
+from google.appengine.api import urlfetch
 
 from yahoo_keyphrase import YahooKeyphrase
 
@@ -24,6 +25,11 @@ class YahooKeyphraseManager:
     key   = self.create_key(text)
     value = memcache.get(key)
     if value is None:
-      value = YahooKeyphrase.extract(self.app_id, text)
+      # MEMO: 1度だけ再試行する
+      try:
+        value = YahooKeyphrase.extract(self.app_id, text)
+      except urlfetch.DownloadError:
+        logging.info("retry download")
+        value = YahooKeyphrase.extract(self.app_id, text)
       memcache.add(key, value, self.ttl)
     return value
