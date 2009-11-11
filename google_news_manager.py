@@ -3,6 +3,7 @@
 import logging
 import sha
 from google.appengine.api import memcache
+from google.appengine.api import urlfetch
 
 from google_news import GoogleNews
 
@@ -17,6 +18,11 @@ class GoogleNewsManager:
     key   = self.create_key(keyword, num)
     value = memcache.get(key)
     if value is None:
-      value = GoogleNews.search(keyword, num)
+      # MEMO: 1度だけ再試行する
+      try:
+        value = GoogleNews.search(keyword, num)
+      except urlfetch.DownloadError:
+        logging.info("retry download")
+        value = GoogleNews.search(keyword, num)
       memcache.add(key, value, self.ttl)
     return value
