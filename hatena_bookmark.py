@@ -41,18 +41,16 @@ class HatenaBookmark:
     return re.sub(pattern, "", html)
 
   @classmethod
-  def extract_summary(cls, html):
-    doc = BeautifulSoup(html)
-    summary = doc.find("blockquote", {"id": "entry-extract-content"})
-    summary.find("cite").extract()
-    contents = [elem.string.strip() for elem in summary.findAll(text = True)]
+  def extract_title(cls, document):
+    title    = document.find("a", {"id": "head-entry-link"})
+    contents = [elem.string.strip() for elem in title.findAll(text = True)]
     return "".join(contents)
 
   @classmethod
-  def extract_title(cls, html):
-    document = BeautifulSoup(html)
-    title    = document.find("a", {"id": "head-entry-link"})
-    contents = [elem.string.strip() for elem in title.findAll(text = True)]
+  def extract_summary(cls, document):
+    summary = document.find("blockquote", {"id": "entry-extract-content"})
+    summary.find("cite").extract()
+    contents = [elem.string.strip() for elem in summary.findAll(text = True)]
     return "".join(contents)
 
   @classmethod
@@ -60,7 +58,10 @@ class HatenaBookmark:
     entry_url = cls.create_entry_url(url)
     src1 = cls.fetch_url(entry_url)
     src2 = cls.trim_script_tag(src1)
-    return cls.extract_summary(src2)
+    document = BeautifulSoup(src2)
+    title    = cls.extract_title(document)
+    summary  = cls.extract_summary(document)
+    return (title, summary)
 
   @classmethod
   def create_wsse_created(cls):

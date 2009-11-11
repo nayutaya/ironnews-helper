@@ -59,7 +59,7 @@ class GetSummaryApi(webapp.RequestHandler):
 
       result[number] = {
         "url"    : url,
-        "summary": summary,
+        "summary": summary[1],
       }
 
     json = simplejson.dumps(result, separators=(',',':'))
