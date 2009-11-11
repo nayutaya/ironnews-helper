@@ -3,7 +3,6 @@
 import logging
 import simplejson
 from google.appengine.ext import webapp
-from google.appengine.api import urlfetch
 
 from hatena_bookmark_manager import HatenaBookmarkManager
 
@@ -26,12 +25,7 @@ class GetTitleApi(webapp.RequestHandler):
       url = urls[number]
       if url == "": continue
 
-      # MEMO: 1度だけ再試行する
-      try:
-        title = bookmark_manager.get_title(url)
-      except urlfetch.DownloadError:
-        logging.info("retry download")
-        title = bookmark_manager.get_title(url)
+      title = bookmark_manager.get_title(url)
 
       result[number] = {
         "url"  : url,
@@ -62,12 +56,7 @@ class GetSummaryApi(webapp.RequestHandler):
       url = urls[number]
       if url == "": continue
 
-      # MEMO: 1度だけ再試行する
-      try:
-        title, summary = bookmark_manager.get_summary(url)
-      except urlfetch.DownloadError:
-        logging.info("retry download")
-        title, summary = bookmark_manager.get_summary(url)
+      title, summary = bookmark_manager.get_summary(url)
 
       result[number] = {
         "url"    : url,

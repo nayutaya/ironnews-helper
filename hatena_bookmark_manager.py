@@ -3,6 +3,7 @@
 import sha
 import logging
 from google.appengine.api import memcache
+from google.appengine.api import urlfetch
 
 from hatena_bookmark import HatenaBookmark
 
@@ -27,7 +28,12 @@ class HatenaBookmarkManager:
     key   = self.create_title_key(url)
     value = memcache.get(key)
     if value is None:
-      value = HatenaBookmark.get_title(url, self.username, self.password)
+      # MEMO: 1度だけ再試行する
+      try:
+        value = HatenaBookmark.get_title(url, self.username, self.password)
+      except urlfetch.DownloadError:
+        logging.info("retry download")
+        value = HatenaBookmark.get_title(url, self.username, self.password)
       memcache.add(key, value, self.ttl)
     return value
 
@@ -38,6 +44,11 @@ class HatenaBookmarkManager:
     key   = self.create_summary_key(url)
     value = memcache.get(key)
     if value is None:
-      value = HatenaBookmark.get_summary(url)
+      # MEMO: 1度だけ再試行する
+      try:
+        value = HatenaBookmark.get_summary(url)
+      except urlfetch.DownloadError:
+        logging.info("retry download")
+        value = HatenaBookmark.get_summary(url)
       memcache.add(key, value, self.ttl)
     return value
