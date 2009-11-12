@@ -10,7 +10,8 @@ from hatena_bookmark import HatenaBookmark
 class HatenaBookmarkManager:
   def __init__(self):
     self.username, self.password = self.read_credential()
-    self.ttl = 60 * 60 * 24 # 1 day
+    self.ttl          = 60 * 60 * 24 # 1 day
+    self.ttl_negative = 60 * 5       # 5 minutes
 
   def read_credential(self):
     f = open("config/hatena.id")
@@ -50,5 +51,11 @@ class HatenaBookmarkManager:
       except urlfetch.DownloadError:
         logging.info("retry download")
         value = HatenaBookmark.get_summary(url)
-      memcache.add(key, value, self.ttl)
+
+      if value == (None, None):
+        ttl = self.ttl_negative
+      else:
+        ttl = self.ttl
+
+      memcache.add(key, value, ttl)
     return value
