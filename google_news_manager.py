@@ -9,7 +9,7 @@ from google_news import GoogleNews
 
 class GoogleNewsManager:
   def __init__(self):
-    self.ttl = 60 * 60 # 1 hour
+    self.ttl = 60 * 5 # 5 minutes
 
   def create_key(self, keyword, num):
     return "google_news_" + sha.sha(keyword.encode("utf-8")).hexdigest() + "_" + str(num)
