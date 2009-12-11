@@ -105,10 +105,11 @@ class HatenaBookmark:
 
   @classmethod
   def create_post_request_xml(cls, url):
+    escaped_url = re.sub("&", "&amp;", url)
     return (
       '<entry xmlns="http://purl.org/atom/ns#">'
       '<title>title</title>'
-      '<link rel="related" type="text/html" href="') + url + ('" />'
+      '<link rel="related" type="text/html" href="') + escaped_url + ('" />'
       '</entry>')
 
   @classmethod
