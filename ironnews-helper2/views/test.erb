@@ -1,6 +1,7 @@
 
 <%
 require "appengine-apis/logger"
+require "appengine-apis/memcache"
 
 def get_entry_url(url)
   return url.sub(/^http:\/\//, "http://b.hatena.ne.jp/entry/")
@@ -19,6 +20,12 @@ logger.warn(entry_url)
   link = div.at("a.location-link") if div
   pref = link.inner_text if link
 
+memcache = AppEngine::Memcache.new
+#memcache["test"] = "hoge"
+#memcache.delete("test")
+
 %>
 
 <%=h pref %>
+
+<%=h memcache["test"].inspect %>
