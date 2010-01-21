@@ -1,40 +1,48 @@
 
 <%
-require "appengine-apis/logger"
-require "appengine-apis/memcache"
 
-require "digest/sha1"
-require "base64"
+def fetch_page(url, options = {})
+  timeout = options[:timeout] || 5
 
-def get_entry_url(url)
-  return url.sub(/^http:\/\//, "http://b.hatena.ne.jp/entry/")
+  response = AppEngine::URLFetch.fetch(url, :deadline => timeout)
+  return response.body
 end
 
-def get_page(url)
-logger = AppEngine::Logger.new
+def get_page(url, options = {})
+  timeout = options[:timeout]
+  expire  = options[:expire] || 10 # sec
+
+  # MEMO: なぜかキャッシュが失効しないので、キーに時刻を含めることで対処する
+  time = Time.now.to_i / expire
+  key  = "get_page_#{Digest::SHA1.hexdigest(url)}_#{time}"
+
+  # MEMO: なぜかキャッシュすると文字化けするため、BASE64エンコード/デコードして対処する
   memcache = AppEngine::Memcache.new
-  key   = "get_page_#{Digest::SHA1.hexdigest(url)}"
-logger.warn("key: #{key}")
-  value64 = memcache.get(key)
+  value64  = memcache.get(key)
+
   if value64
-logger.warn("cache hit")
     value = Base64.decode64(value64)
   else
-logger.warn("cache miss")
-    response = AppEngine::URLFetch.fetch(url, :deadline => 10)
-    value    = response.body
-    value64  = Base64.encode64(value)
-    memcache.set(key, value64, 10)
+    value   = fetch_page(url, :timeout => 10)
+    value64 = Base64.encode64(value)
+    memcache.set(key, value64, expire)
   end
+
   return value
 end
+
+def get_entry_page(url)
+  entry_url = get_entry_url(url)
+  page      = get_page(entry_url, :timeout => 10, :expire => 10)
+  return page
+end
+
 
   logger = AppEngine::Logger.new
 
   url = "http://mainichi.jp/area/osaka/news/20100121ddlk27040388000c.html"
 
-  entry_url = get_entry_url(url)
-  body = get_page(entry_url)
+  body = get_entry_page(url)
 
   doc  = Hpricot.parse(body)
   div  = doc.at("#entryinfo-body")
@@ -43,4 +51,6 @@ end
 
 %>
 
-<%=h pref %>
+<div><%=h pref %></div>
+
+<div><%=h AppEngine::Memcache.new.stats.inspect %></div>
