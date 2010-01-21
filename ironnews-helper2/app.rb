@@ -11,6 +11,6 @@ end
 
 require "hpricot"
 
-get "/hatena_bookmark/get_area" do
+get "/hatena_bookmark/get_pref" do
   erb(:test)
 end

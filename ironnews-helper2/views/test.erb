@@ -1,5 +1,6 @@
 
 <%
+require "appengine-apis/logger"
 
   #url = "http://b.hatena.ne.jp/entry/gigazine.net/index.php?/news/comments/20100121_paragon_backup_recovery_free/"
   url = "http://b.hatena.ne.jp/entry/alfalfalfa.com/archives/383013.html"
@@ -9,14 +10,11 @@
   doc  = Hpricot.parse(response.body)
   div  = doc.at("#entryinfo-body")
   link = div.at("a.location-link")
-#  area = link.text if link
+  pref = link.inner_text if link
 
-=begin
-  div  = doc.css("#entryinfo-body").first
-  link = div.css("a.location-link").first if div
-  return link.text if link
-=end
+  logger = AppEngine::Logger.new
+  logger.warn "foobar"
 
 %>
 
-<%=h link.inner_text %>
+<%=h pref %>
