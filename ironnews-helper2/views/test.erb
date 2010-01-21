@@ -65,7 +65,7 @@ def get_pref(url)
 
   # MEMO: なぜかキャッシュが失効しないので、キーに時刻を含めることで対処する
   time = Time.now.to_i / expire
-  key  = "get_page_#{Digest::SHA1.hexdigest(url)}_#{time}"
+  key  = "get_pref_#{Digest::SHA1.hexdigest(url)}_#{time}"
 
   memcache = MemcacheBase64.new
   value    = memcache.get(key)
