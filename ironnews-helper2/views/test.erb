@@ -4,36 +4,43 @@ require "appengine-apis/logger"
 require "appengine-apis/memcache"
 
 require "digest/sha1"
+require "base64"
 
 def get_entry_url(url)
   return url.sub(/^http:\/\//, "http://b.hatena.ne.jp/entry/")
 end
 
 def get_page(url)
+logger = AppEngine::Logger.new
+  memcache = AppEngine::Memcache.new
+  key   = "get_page_#{Digest::SHA1.hexdigest(url)}"
+logger.warn("key: #{key}")
+  value64 = memcache.get(key)
+  if value64
+logger.warn("cache hit")
+    value = Base64.decode64(value64)
+  else
+logger.warn("cache miss")
+    response = AppEngine::URLFetch.fetch(url, :deadline => 10)
+    value    = response.body
+    value64  = Base64.encode64(value)
+    memcache.set(key, value64, 10)
+  end
+  return value
 end
-
 
   logger = AppEngine::Logger.new
 
   url = "http://mainichi.jp/area/osaka/news/20100121ddlk27040388000c.html"
 
   entry_url = get_entry_url(url)
-logger.warn(entry_url)
-  response = AppEngine::URLFetch.fetch(entry_url, :deadline => 10)
+  body = get_page(entry_url)
 
-  doc  = Hpricot.parse(response.body)
+  doc  = Hpricot.parse(body)
   div  = doc.at("#entryinfo-body")
   link = div.at("a.location-link") if div
   pref = link.inner_text if link
 
-memcache = AppEngine::Memcache.new
-#memcache["test"] = "hoge"
-#memcache.delete("test")
-
 %>
 
 <%=h pref %>
-
-<%=h memcache["test"].inspect %>
-
-<%=h Digest::SHA1.hexdigest("hoge").inspect %>
