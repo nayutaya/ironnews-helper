@@ -3,9 +3,15 @@
 require "appengine-apis/logger"
 require "appengine-apis/memcache"
 
+require "digest/sha1"
+
 def get_entry_url(url)
   return url.sub(/^http:\/\//, "http://b.hatena.ne.jp/entry/")
 end
+
+def get_page(url)
+end
+
 
   logger = AppEngine::Logger.new
 
@@ -29,3 +35,5 @@ memcache = AppEngine::Memcache.new
 <%=h pref %>
 
 <%=h memcache["test"].inspect %>
+
+<%=h Digest::SHA1.hexdigest("hoge").inspect %>
