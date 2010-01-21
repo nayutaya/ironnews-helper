@@ -2,7 +2,6 @@
 
 require "appengine-apis/logger"
 require "appengine-apis/memcache"
-require "digest/sha1"
 
 helpers do
   include Rack::Utils

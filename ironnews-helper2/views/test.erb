@@ -1,64 +1,7 @@
 
 <%
 
-require "lib/memcache_base64"
-
-def fetch_page(url, options = {})
-  timeout = options[:timeout] || 5
-
-  response = AppEngine::URLFetch.fetch(url, :deadline => timeout)
-  return response.body
-end
-
-def get_page(url, options = {})
-  timeout = options[:timeout]
-  expire  = options[:expire] || 10 # sec
-
-  # MEMO: なぜかキャッシュが失効しないので、キーに時刻を含めることで対処する
-  time = Time.now.to_i / expire
-  key  = "get_page_#{Digest::SHA1.hexdigest(url)}_#{time}"
-
-  memcache = MemcacheBase64.new
-  value    = memcache.get(key)
-  unless value
-    value = fetch_page(url, :timeout => 10)
-    memcache.set(key, value, expire)
-  end
-
-  return value
-end
-
-def get_entry_page(url)
-  entry_url = get_entry_url(url)
-  page      = get_page(entry_url, :timeout => 10, :expire => 10)
-  return page
-end
-
-def get_pref_without_cache(url)
-  body = get_entry_page(url)
-  doc  = Hpricot.parse(body)       if body
-  div  = doc.at("#entryinfo-body") if doc
-  link = div.at("a.location-link") if div
-  pref = link.inner_text           if link
-  return pref
-end
-
-def get_pref(url)
-  expire = 10 # sec
-
-  # MEMO: なぜかキャッシュが失効しないので、キーに時刻を含めることで対処する
-  time = Time.now.to_i / expire
-  key  = "get_pref_#{Digest::SHA1.hexdigest(url)}_#{time}"
-
-  memcache = MemcacheBase64.new
-  value    = memcache.get(key)
-  unless value
-    value = get_pref_without_cache(url)
-    memcache.set(key, value, expire)
-  end
-
-  return value
-end
+require "lib/hatena_bookmark"
 
 
   logger = AppEngine::Logger.new
@@ -66,7 +9,7 @@ end
   url = "http://mainichi.jp/area/osaka/news/20100121ddlk27040388000c.html"
   url = "http://mainichi.jp/area/aomori/news/20100121ddlk02020110000c.html"
 
-  pref = get_pref(url)
+  pref = HatenaBookmark.get_pref(url)
 
 %>
 
