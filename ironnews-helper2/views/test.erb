@@ -2,18 +2,22 @@
 <%
 require "appengine-apis/logger"
 
-  #url = "http://b.hatena.ne.jp/entry/gigazine.net/index.php?/news/comments/20100121_paragon_backup_recovery_free/"
-  url = "http://b.hatena.ne.jp/entry/alfalfalfa.com/archives/383013.html"
+def get_entry_url(url)
+  return url.sub(/^http:\/\//, "http://b.hatena.ne.jp/entry/")
+end
 
-  response = AppEngine::URLFetch.fetch(url)
+  logger = AppEngine::Logger.new
+
+  url = "http://mainichi.jp/area/osaka/news/20100121ddlk27040388000c.html"
+
+  entry_url = get_entry_url(url)
+logger.warn(entry_url)
+  response = AppEngine::URLFetch.fetch(entry_url, :deadline => 10)
 
   doc  = Hpricot.parse(response.body)
   div  = doc.at("#entryinfo-body")
-  link = div.at("a.location-link")
+  link = div.at("a.location-link") if div
   pref = link.inner_text if link
-
-  logger = AppEngine::Logger.new
-  logger.warn "foobar"
 
 %>
 
