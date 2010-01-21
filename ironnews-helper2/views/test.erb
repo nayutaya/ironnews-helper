@@ -37,17 +37,22 @@ def get_entry_page(url)
   return page
 end
 
+def get_pref(url)
+  body = get_entry_page(url)
+  doc  = Hpricot.parse(body)       if body
+  div  = doc.at("#entryinfo-body") if doc
+  link = div.at("a.location-link") if div
+  pref = link.inner_text           if link
+  return pref
+end
+
 
   logger = AppEngine::Logger.new
 
   url = "http://mainichi.jp/area/osaka/news/20100121ddlk27040388000c.html"
+  url = "http://mainichi.jp/area/aomori/news/20100121ddlk02020110000c.html"
 
-  body = get_entry_page(url)
-
-  doc  = Hpricot.parse(body)
-  div  = doc.at("#entryinfo-body")
-  link = div.at("a.location-link") if div
-  pref = link.inner_text if link
+  pref = get_pref(url)
 
 %>
 
