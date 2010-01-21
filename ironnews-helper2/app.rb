@@ -1,7 +1,7 @@
 #! ruby -Ku
 
 require "appengine-apis/logger"
-require "appengine-apis/memcache"
+require "json"
 
 helpers do
   include Rack::Utils
@@ -12,12 +12,18 @@ get "/" do
   "ironnews-helper2 v4"
 end
 
-require "hpricot"
-
-def get_entry_url(url)
-  return url.sub(/^http:\/\//, "http://b.hatena.ne.jp/entry/")
-end
+require "lib/hatena_bookmark"
 
 get "/hatena_bookmark/get_pref" do
-  erb(:test)
+  #logger = AppEngine::Logger.new
+  #AppEngine::Memcache.new.stats
+
+  url  = params[:url]
+  pref = HatenaBookmark.get_pref(url)
+
+  {
+    "success" => true,
+    "url"     => url,
+    "pref"    => pref,
+  }.to_json
 end

@@ -1,9 +1,14 @@
 
 require "digest/sha1"
+require "hpricot"
 require "lib/memcache_base64"
 
 # FIXME: memcacheのネームスペースを指定
 module HatenaBookmark
+  def self.get_entry_url(url)
+    return url.sub(/^http:\/\//, "http://b.hatena.ne.jp/entry/")
+  end
+
   # FIXME: エラー処理
   def self.fetch_page(url, options = {})
     timeout = options[:timeout] || 5
@@ -30,7 +35,7 @@ module HatenaBookmark
   end
 
   def self.get_entry_page(url)
-    entry_url = get_entry_url(url)
+    entry_url = self.get_entry_url(url)
     page      = self.get_page(entry_url, :timeout => 10, :expire => 10)
     return page
   end

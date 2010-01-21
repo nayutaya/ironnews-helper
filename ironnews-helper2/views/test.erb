@@ -1,18 +1,5 @@
 
+<%# テスト用のerbファイル %>
+
 <%
-
-require "lib/hatena_bookmark"
-
-
-  logger = AppEngine::Logger.new
-
-  url = "http://mainichi.jp/area/osaka/news/20100121ddlk27040388000c.html"
-  url = "http://mainichi.jp/area/aomori/news/20100121ddlk02020110000c.html"
-
-  pref = HatenaBookmark.get_pref(url)
-
 %>
-
-<div><%=h pref %></div>
-
-<div><%=h AppEngine::Memcache.new.stats.inspect %></div>
