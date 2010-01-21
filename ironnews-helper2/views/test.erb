@@ -1,6 +1,25 @@
 
 <%
 
+# MEMO: なぜかキャッシュすると文字化けするため、BASE64エンコード/デコードして対処する
+class MemcacheBase64
+  def initialize
+    @memcache = AppEngine::Memcache.new
+  end
+
+  def get(key)
+    value64 = @memcache.get(key)
+    return nil unless value64
+    return Base64.decode64(value64)
+  end
+
+  def set(key, value, expiration = 0)
+    value64 = Base64.encode64(value)
+    return @memcache.set(key, value64, expiration)
+  end
+end
+
+
 def fetch_page(url, options = {})
   timeout = options[:timeout] || 5
 
@@ -16,16 +35,11 @@ def get_page(url, options = {})
   time = Time.now.to_i / expire
   key  = "get_page_#{Digest::SHA1.hexdigest(url)}_#{time}"
 
-  # MEMO: なぜかキャッシュすると文字化けするため、BASE64エンコード/デコードして対処する
-  memcache = AppEngine::Memcache.new
-  value64  = memcache.get(key)
-
-  if value64
-    value = Base64.decode64(value64)
-  else
-    value   = fetch_page(url, :timeout => 10)
-    value64 = Base64.encode64(value)
-    memcache.set(key, value64, expire)
+  memcache = MemcacheBase64.new
+  value    = memcache.get(key)
+  unless value
+    value = fetch_page(url, :timeout => 10)
+    memcache.set(key, value, expire)
   end
 
   return value
@@ -53,19 +67,11 @@ def get_pref(url)
   time = Time.now.to_i / expire
   key  = "get_page_#{Digest::SHA1.hexdigest(url)}_#{time}"
 
-  # MEMO: なぜかキャッシュすると文字化けするため、BASE64エンコード/デコードして対処する
-  memcache = AppEngine::Memcache.new
-  value64  = memcache.get(key)
-  logger = AppEngine::Logger.new
-
-  if value64
-logger.warn("cache hit")
-    value = Base64.decode64(value64)
-  else
-logger.warn("cache miss")
-    value   = get_pref_without_cache(url)
-    value64 = Base64.encode64(value)
-    memcache.set(key, value64, expire)
+  memcache = MemcacheBase64.new
+  value    = memcache.get(key)
+  unless value
+    value = get_pref_without_cache(url)
+    memcache.set(key, value, expire)
   end
 
   return value
