@@ -4,7 +4,7 @@ require "cgi"
 module GoogleAjaxFeedsApi
   def self.create_parameter(options = {})
     options = options.dup
-    url = options.delete(:url) || nil
+    url = options.delete(:url) || raise(ArgumentError)
     num = options.delete(:num) || 10
     raise(ArgumentError) unless options.empty?
 

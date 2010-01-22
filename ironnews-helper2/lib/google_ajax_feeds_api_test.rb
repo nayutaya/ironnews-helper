@@ -10,14 +10,16 @@ class GoogleAjaxFeedsApiTest < Test::Unit::TestCase
     @module = GoogleAjaxFeedsApi
   end
 
-  def test_create_parameter__empty
+  def test_create_parameter__minimal
     expected = {
       "v"      => "1.0",
       "output" => "json",
-      "q"      => nil,
+      "q"      => "http://example.jp/",
       "num"    => "10",
     }
-    assert_equal(expected, @module.create_parameter())
+    assert_equal(
+      expected,
+      @module.create_parameter(:url => "http://example.jp/"))
   end
 
   def test_create_parameter__full
@@ -27,9 +29,17 @@ class GoogleAjaxFeedsApiTest < Test::Unit::TestCase
       "q"      => "http://example.jp/",
       "num"    => "20",
     }
-    assert_equal(expected, @module.create_parameter(
-      :url => "http://example.jp/",
-      :num => 20))
+    assert_equal(
+      expected,
+      @module.create_parameter(
+        :url => "http://example.jp/",
+        :num => 20))
+  end
+
+  def test_create_parameter__no_url
+    assert_raise(ArgumentError) {
+      @module.create_parameter()
+    }
   end
 
   def test_create_parameter__invalid_parameter
@@ -46,8 +56,8 @@ class GoogleAjaxFeedsApiTest < Test::Unit::TestCase
 
   def test_create_url
     assert_equal(
-      "http://ajax.googleapis.com/ajax/services/feed/load?num=10&output=json&q=&v=1.0",
-      @module.create_url())
+      "http://ajax.googleapis.com/ajax/services/feed/load?num=10&output=json&q=http%3A%2F%2Fexample.jp%2F&v=1.0",
+      @module.create_url(:url => "http://example.jp/"))
     assert_equal(
       "http://ajax.googleapis.com/ajax/services/feed/load?num=20&output=json&q=http%3A%2F%2Fexample.jp%2F&v=1.0",
       @module.create_url(:url => "http://example.jp/", :num => 20))
