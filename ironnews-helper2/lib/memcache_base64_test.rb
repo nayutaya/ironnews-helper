@@ -1,9 +1,11 @@
-#! ruby -Ku -rubygems
+#! ruby -Ku
 
 $TEST_MODE = true
 
 require "test/unit"
+require "rubygems"
 require "kagemusha"
+
 require "memcache_base64"
 
 # Mock Class
@@ -29,10 +31,14 @@ class MemcacheBase64Test < Test::Unit::TestCase
     @obj   = @klass.new
   end
 
-  def test_memcache
-    assert_kind_of(
-      AppEngine::Memcache,
-      @obj.memcache)
+  def test_initialize__default
+    obj = @klass.new
+    assert_kind_of(AppEngine::Memcache, obj.memcache)
+  end
+
+  def test_initialize__with_memcache
+    obj = @klass.new({})
+    assert_kind_of(Hash, obj.memcache)
   end
 
   def test_get
