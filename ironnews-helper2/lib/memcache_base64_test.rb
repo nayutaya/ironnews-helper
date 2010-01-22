@@ -46,4 +46,14 @@ class MemcacheBase64Test < Test::Unit::TestCase
     @obj.set("foo", "ABC")
     assert_equal("QUJD\n", @obj.memcache.store["foo"])
   end
+
+  def test_set_and_get
+    assert_equal(nil, @obj.get("foo"))
+    @obj.set("foo", "ふー")
+    assert_equal("ふー", @obj.get("foo"))
+
+    assert_equal(nil, @obj.get("bar"))
+    @obj.set("bar", "ばー")
+    assert_equal("ばー", @obj.get("bar"))
+  end
 end

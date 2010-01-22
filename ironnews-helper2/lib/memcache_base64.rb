@@ -3,6 +3,7 @@ require "base64"
 require "appengine-apis/memcache" unless $TEST_MODE
 
 # MEMO: なぜかキャッシュすると文字化けするため、BASE64エンコード/デコードして対処する
+
 class MemcacheBase64
   def initialize
     @memcache = AppEngine::Memcache.new
