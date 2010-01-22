@@ -6,6 +6,7 @@ module GoogleAjaxFeedsApi
     options = options.dup
     url = options.delete(:url) || nil
     num = options.delete(:num) || 10
+    raise(ArgumentError) unless options.empty?
 
     return {
       "v"      => "1.0",
@@ -23,6 +24,7 @@ module GoogleAjaxFeedsApi
     options = options.dup
     url = options.delete(:url)
     num = options.delete(:num)
+    raise(ArgumentError) unless options.empty?
 
     params = self.create_parameter(:url => url, :num => num)
     query  = params.

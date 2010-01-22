@@ -32,6 +32,12 @@ class GoogleAjaxFeedsApiTest < Test::Unit::TestCase
       :num => 20))
   end
 
+  def test_create_parameter__invalid_parameter
+    assert_raise(ArgumentError) {
+      @module.create_parameter(:invalid => true)
+    }
+  end
+
   def test_create_base_url
     assert_equal(
       "http://ajax.googleapis.com/ajax/services/feed/load",
@@ -45,5 +51,11 @@ class GoogleAjaxFeedsApiTest < Test::Unit::TestCase
     assert_equal(
       "http://ajax.googleapis.com/ajax/services/feed/load?num=20&output=json&q=http%3A%2F%2Fexample.jp%2F&v=1.0",
       @module.create_url(:url => "http://example.jp/", :num => 20))
+  end
+
+  def test_create_url__invalid_parameter
+    assert_raise(ArgumentError) {
+      @module.create_url(:invalid => true)
+    }
   end
 end
