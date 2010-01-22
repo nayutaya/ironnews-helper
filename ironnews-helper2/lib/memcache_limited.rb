@@ -1,19 +1,21 @@
 
 class MemcacheLimited
-  def initialize(memcache)
-    @memcache = memcache
+  def initialize(memcache, expiration)
+    @memcache   = memcache
+    @expiration = expiration
   end
 
-  attr_reader :memcache
+  attr_reader :memcache, :expiration
+
+  def create_key(key)
+    return "#{key}_#{Time.now.to_i / @expiration * @expiration}"
+  end
 
   def get(key)
-    key2 = "#{key}_#{Time.now.to_i}"
-    return @memcache.get(key2)
+    return @memcache.get(self.create_key(key))
   end
 
   def set(key, value, expiration = 0)
-    key2 = "#{key}_#{Time.now.to_i}"
-    @memcache.set(key2, value, expiration)
-    return true
+    return @memcache.set(self.create_key(key), value, expiration)
   end
 end
