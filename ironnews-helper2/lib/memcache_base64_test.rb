@@ -3,25 +3,8 @@
 require "test/unit"
 require "rubygems"
 require "kagemusha"
-
+require "memcache_mock"
 require "memcache_base64"
-
-class MemcacheMock
-  def initialize
-    @store = {}
-  end
-
-  attr_reader :store
-
-  def get(key)
-    return @store[key]
-  end
-
-  def set(key, value, expiration = 0)
-    @store[key] = value
-    return true
-  end
-end
 
 class MemcacheBase64Test < Test::Unit::TestCase
   def setup
