@@ -1,10 +1,15 @@
 
 require "digest/sha1"
 require "hpricot"
+require "appengine-apis/memcache"
 require "lib/memcache_base64"
 
 # FIXME: memcacheのネームスペースを指定
 module HatenaBookmark
+  def self.get_memcache
+    return MemcacheBase64.new(AppEngine::Memcache.new(:namespace => "hatena_bookmark"))
+  end
+
   def self.get_entry_url(url)
     return url.sub(/^http:\/\//, "http://b.hatena.ne.jp/entry/")
   end
@@ -24,7 +29,7 @@ module HatenaBookmark
     time = Time.now.to_i / expire
     key  = "get_page_#{Digest::SHA1.hexdigest(url)}_#{time}"
 
-    memcache = MemcacheBase64.new
+    memcache = self.get_memcache
     value    = memcache.get(key)
     unless value
       value = self.fetch_page(url, :timeout => 10)
@@ -56,7 +61,7 @@ module HatenaBookmark
     time = Time.now.to_i / expire
     key  = "get_pref_#{Digest::SHA1.hexdigest(url)}_#{time}"
 
-    memcache = MemcacheBase64.new
+    memcache = self.get_memcache
     value    = memcache.get(key)
     unless value
       value = self.get_pref_without_cache(url)

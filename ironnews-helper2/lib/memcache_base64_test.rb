@@ -1,44 +1,37 @@
 #! ruby -Ku
 
-$TEST_MODE = true
-
 require "test/unit"
 require "rubygems"
 require "kagemusha"
 
 require "memcache_base64"
 
-# Mock Class
-module AppEngine
-  class Memcache
-    def initialize
-      @store = {}
-    end
-    attr_reader :store
-    def get(key)
-      return @store[key]
-    end
-    def set(key, value, expiration = 0)
-      @store[key] = value
-      return true
-    end
+class MockCache
+  def initialize
+    @store = {}
+  end
+
+  attr_reader :store
+
+  def get(key)
+    return @store[key]
+  end
+
+  def set(key, value, expiration = 0)
+    @store[key] = value
+    return true
   end
 end
 
 class MemcacheBase64Test < Test::Unit::TestCase
   def setup
     @klass = MemcacheBase64
-    @obj   = @klass.new
+    @obj   = @klass.new(MockCache.new)
   end
 
-  def test_initialize__default
-    obj = @klass.new
-    assert_kind_of(AppEngine::Memcache, obj.memcache)
-  end
-
-  def test_initialize__with_memcache
-    obj = @klass.new({})
-    assert_kind_of(Hash, obj.memcache)
+  def test_initialize
+    obj = @klass.new(MockCache.new)
+    assert_kind_of(MockCache, obj.memcache)
   end
 
   def test_get
