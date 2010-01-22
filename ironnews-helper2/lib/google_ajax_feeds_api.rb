@@ -26,8 +26,7 @@ module GoogleAjaxFeedsApi
     num = options.delete(:num)
     raise(ArgumentError) unless options.empty?
 
-    params = self.create_parameter(:url => url, :num => num)
-    query  = params.
+    query = self.create_parameter(:url => url, :num => num).
       sort_by { |key, value| key }.
       map     { |key, value| CGI.escape(key) + "=" + CGI.escape(value.to_s) }.join("&")
     return self.create_base_url + "?" + query
