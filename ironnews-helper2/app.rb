@@ -12,12 +12,14 @@ get "/" do
   "ironnews-helper2 v4"
 end
 
+=begin
 get "/test" do
   require "lib/google_ajax_feeds_api"
   url = GoogleAjaxFeedsApi.create_url(:url => "http://api.tetsudo.com/news/atom.xml")
   response = AppEngine::URLFetch.fetch(url, :deadline => 10)
   return response.body
 end
+=end
 
 require "lib/hatena_bookmark"
 
