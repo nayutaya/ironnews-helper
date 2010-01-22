@@ -31,4 +31,19 @@ class GoogleAjaxFeedsApiTest < Test::Unit::TestCase
       :url => "http://example.jp/",
       :num => 20))
   end
+
+  def test_create_base_url
+    assert_equal(
+      "http://ajax.googleapis.com/ajax/services/feed/load",
+      @module.create_base_url())
+  end
+
+  def test_create_url
+    assert_equal(
+      "http://ajax.googleapis.com/ajax/services/feed/load?num=10&output=json&q=&v=1.0",
+      @module.create_url())
+    assert_equal(
+      "http://ajax.googleapis.com/ajax/services/feed/load?num=20&output=json&q=http%3A%2F%2Fexample.jp%2F&v=1.0",
+      @module.create_url(:url => "http://example.jp/", :num => 20))
+  end
 end
