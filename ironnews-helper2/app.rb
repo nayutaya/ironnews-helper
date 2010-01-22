@@ -13,7 +13,8 @@ get "/" do
 end
 
 get "/test" do
-  url = "http://ajax.googleapis.com/ajax/services/feed/load?q=http%3a%2f%2fwww3%2easahi%2ecom%2frss%2findex%2erdf&v=1.0&output=json&num=20"
+  require "lib/google_ajax_feeds_api"
+  url = GoogleAjaxFeedsApi.create_url(:url => "http://api.tetsudo.com/news/atom.xml")
   response = AppEngine::URLFetch.fetch(url, :deadline => 10)
   return response.body
 end
