@@ -6,7 +6,7 @@ require "kagemusha"
 
 require "memcache_base64"
 
-class MockCache
+class MemcacheMock
   def initialize
     @store = {}
   end
@@ -26,12 +26,12 @@ end
 class MemcacheBase64Test < Test::Unit::TestCase
   def setup
     @klass = MemcacheBase64
-    @obj   = @klass.new(MockCache.new)
+    @obj   = @klass.new(MemcacheMock.new)
   end
 
   def test_initialize
-    obj = @klass.new(MockCache.new)
-    assert_kind_of(MockCache, obj.memcache)
+    obj = @klass.new(MemcacheMock.new)
+    assert_kind_of(MemcacheMock, obj.memcache)
   end
 
   def test_get
