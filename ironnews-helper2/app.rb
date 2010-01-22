@@ -12,6 +12,10 @@ get "/" do
   "ironnews-helper2 v4"
 end
 
+get "/test" do
+  erb(:test)
+end
+
 =begin
 get "/test" do
   require "lib/google_ajax_feeds_api"

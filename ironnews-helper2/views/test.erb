@@ -2,4 +2,13 @@
 <%# テスト用のerbファイル %>
 
 <%
+
+require "appengine-apis/memcache"
+require "patch"
+
+memcache = AppEngine::Memcache.new
+
+memcache.set("foo", "日本語です")
 %>
+
+<%=h memcache.get("foo") %>
