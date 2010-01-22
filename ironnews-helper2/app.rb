@@ -12,6 +12,12 @@ get "/" do
   "ironnews-helper2 v4"
 end
 
+get "/test" do
+  url = "http://ajax.googleapis.com/ajax/services/feed/load?q=http%3a%2f%2fwww3%2easahi%2ecom%2frss%2findex%2erdf&v=1.0&output=json&num=20"
+  response = AppEngine::URLFetch.fetch(url, :deadline => 10)
+  return response.body
+end
+
 require "lib/hatena_bookmark"
 
 get "/hatena_bookmark/get_pref" do
