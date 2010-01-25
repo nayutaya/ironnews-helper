@@ -74,4 +74,16 @@ module GoogleNews
       }
     }
   end
+
+  def self.search(options = {})
+    options = options.dup
+    keyword = options.delete(:keyword) || nil
+    num     = options.delete(:num)     || nil
+    raise(ArgumentError) unless options.empty?
+
+    rss = self.fetch_rss(:keyword => keyword, :num => num)
+    items = self.parse_rss(rss)
+
+    return items
+  end
 end

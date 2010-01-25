@@ -98,4 +98,8 @@ class GoogleNewsTest < Test::Unit::TestCase
     rss = File.open("google_news.xml", "rb") { |file| file.read }
     items = @module.parse_rss(rss)
   end
+
+  def test_search
+    p @module.search(:keyword => "鉄道", :num => 10)
+  end
 end
