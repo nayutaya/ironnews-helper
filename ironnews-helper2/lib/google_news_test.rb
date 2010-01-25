@@ -86,4 +86,8 @@ class GoogleNewsTest < Test::Unit::TestCase
       @module.create_url(:keyword => "keyword", :invalid => true)
     }
   end
+
+  def test_fetch_rss
+    @module.fetch_rss(:keyword => "鉄道", :num => 10)
+  end
 end
