@@ -2,6 +2,7 @@
 require "cgi"
 require "uri"
 require "net/http"
+require "rss"
 
 if RUBY_PLATFORM =~ /jruby/
   require "appengine-apis/urlfetch"
@@ -44,6 +45,7 @@ module GoogleNews
     return self.create_base_url + "?" + query
   end
 
+  # FIXME: タイムアウトの設定
   def self.fetch_rss(options = {})
     options = options.dup
     keyword = options.delete(:keyword) || nil
@@ -61,5 +63,13 @@ module GoogleNews
         return nil
       end
     }
+  end
+
+  def self.parse_rss(src)
+    rss = RSS::Parser.parse(src)
+rss.items.each { |item|
+p item.title
+p item.guid.content[/cluster=(.+?)$/, 1]
+}
   end
 end
