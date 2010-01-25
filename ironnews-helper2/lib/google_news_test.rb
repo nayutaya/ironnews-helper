@@ -87,13 +87,15 @@ class GoogleNewsTest < Test::Unit::TestCase
     }
   end
 
+  # FIXME: テストせよ
   def test_fetch_rss
     xml = @module.fetch_rss(:keyword => "鉄道", :num => 10)
     #File.open("out.xml", "wb") { |file| file.write(xml) }
   end
 
+  # FIXME: テストせよ
   def test_parse_rss
     rss = File.open("google_news.xml", "rb") { |file| file.read }
-    x = @module.parse_rss(rss)
+    items = @module.parse_rss(rss)
   end
 end
