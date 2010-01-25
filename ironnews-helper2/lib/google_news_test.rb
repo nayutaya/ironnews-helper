@@ -110,13 +110,28 @@ class GoogleNewsTest < Test::Unit::TestCase
     assert_equal(nil, @module.fetch_url("http://www.google.co.jp/notfound"))
   end
 
-  # FIXME: テストせよ
   def test_parse_rss
     rss = File.open("#{__DIR__}/google_news.xml", "rb") { |file| file.read }
+
     items = @module.parse_rss(rss)
+
+    assert_equal(10, items.size)
+    assert_equal(true, items.all? { |h| h.has_key?(:title) })
+    assert_equal(true, items.all? { |h| h.has_key?(:url) })
+
+    assert_equal(
+      "＜東証＞鉄道株が小幅高 ＪＰモルガン系の投信設定で思惑 - 日本経済新聞",
+      items[0][:title])
+    assert_equal(
+      "http://markets.nikkei.co.jp/kokunai/chumoku.aspx?id=ASFL25047%2025012010",
+      items[0][:url])
   end
 
   def test_search
-    p @module.search(:keyword => "鉄道", :num => 10)
+    items = @module.search(:keyword => "鉄道", :num => 10)
+
+    assert_equal(10, items.size)
+    assert_equal(true, items.all? { |h| h.has_key?(:title) })
+    assert_equal(true, items.all? { |h| h.has_key?(:url) })
   end
 end
