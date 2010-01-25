@@ -61,7 +61,13 @@ get "/google_news/search" do
     :keyword => keyword,
     :num     => num)
 
+  result = items.map { |item|
+    {
+      "title" => item[:title],
+      "url"   => item[:url],
+    }
+  }
+
   content_type("text/javascript")
-  json = items.to_json
-  return (callback ? "#{callback}(#{json})" : json)
+  return (callback ? "#{callback}(#{result.to_json})" : result.to_json)
 end
