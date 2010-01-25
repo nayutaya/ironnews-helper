@@ -49,3 +49,19 @@ get "/hatena_bookmark/get_pref" do
     "pref"    => pref,
   }.to_json
 end
+
+require "lib/google_news"
+
+get "/google_news/search" do
+  keyword  = (params[:keyword]  || nil)
+  num      = (params[:num]      || "10").to_i
+  callback = (params[:callback] || nil)
+
+  items = GoogleNews.search(
+    :keyword => keyword,
+    :num     => num)
+
+  content_type("text/javascript")
+  json = items.to_json
+  return (callback ? "#{callback}(#{json})" : json)
+end
