@@ -51,13 +51,7 @@ module GoogleNews
   end
 
   # FIXME: タイムアウトの設定
-  def self.fetch_rss(options = {})
-    options = options.dup
-    keyword = options.delete(:keyword) || nil
-    num     = options.delete(:num)     || nil
-    raise(ArgumentError) unless options.empty?
-
-    url = self.create_url(:keyword => keyword, :num => num)
+  def self.fetch_url(url)
     uri = URI.parse(url)
 
     Net::HTTP.start(uri.host, uri.port) { |http|
@@ -86,7 +80,8 @@ module GoogleNews
     num     = options.delete(:num)     || nil
     raise(ArgumentError) unless options.empty?
 
-    rss = self.fetch_rss(:keyword => keyword, :num => num)
+    url   = self.create_url(:keyword => keyword, :num => num)
+    rss   = self.fetch_url(url)
     items = self.parse_rss(rss)
 
     return items

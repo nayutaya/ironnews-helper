@@ -4,6 +4,7 @@ require "test/unit"
 require "rubygems"
 require "win32console" if RUBY_PLATFORM =~ /win32/
 require "redgreen"
+require "facets"
 
 require "google_news"
 
@@ -99,15 +100,19 @@ class GoogleNewsTest < Test::Unit::TestCase
     }
   end
 
-  # FIXME: テストせよ
-  def test_fetch_rss
-    xml = @module.fetch_rss(:keyword => "鉄道", :num => 10)
-    #File.open("out.xml", "wb") { |file| file.write(xml) }
+  def test_fetch_url
+    assert_kind_of(
+      String,
+      @module.fetch_url("http://www.google.co.jp/"))
+  end
+
+  def test_fetch_url__not_found
+    assert_equal(nil, @module.fetch_url("http://www.google.co.jp/notfound"))
   end
 
   # FIXME: テストせよ
   def test_parse_rss
-    rss = File.open("google_news.xml", "rb") { |file| file.read }
+    rss = File.open("#{__DIR__}/google_news.xml", "rb") { |file| file.read }
     items = @module.parse_rss(rss)
   end
 
