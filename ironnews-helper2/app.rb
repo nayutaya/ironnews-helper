@@ -52,6 +52,7 @@ end
 
 require "lib/google_news"
 
+# FIXME: キャッシュ機構を追加すること
 get "/google_news/search" do
   keyword  = (params[:keyword]  || nil)
   num      = (params[:num]      || "10").to_i
