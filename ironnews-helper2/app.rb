@@ -57,14 +57,14 @@ get "/google_news/search" do
   num      = (params[:num]      || "10").to_i
   callback = (params[:callback] || nil)
 
-  items = GoogleNews.search(
+  articles = GoogleNews.search(
     :keyword => keyword,
     :num     => num)
 
-  result = items.map { |item|
+  result = articles.map { |article|
     {
-      "title" => item[:title],
-      "url"   => item[:url],
+      "title" => article.title,
+      "url"   => article.url,
     }
   }
 
