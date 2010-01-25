@@ -67,10 +67,9 @@ module GoogleNews
   def self.parse_rss(src)
     rss = RSS::Parser.parse(src)
     return rss.items.map { |item|
-      {
+      Article.new(
         :title => item.title,
-        :url   => item.guid.content[/cluster=(.+?)$/, 1],
-      }
+        :url   => item.guid.content[/cluster=(.+?)$/, 1])
     }
   end
 
