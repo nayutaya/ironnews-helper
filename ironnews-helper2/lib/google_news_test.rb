@@ -57,6 +57,18 @@ class GoogleNewsTest < Test::Unit::TestCase
       @module.create_base_url())
   end
 
+  def test_encode_params
+    assert_equal(
+      "a=1&b=2&c=3",
+      @module.encode_params("a" => "1", "b" => "2", "c" => "3"))
+  end
+
+  def test_encode_params__encode
+    assert_equal(
+      "+=+",
+      @module.encode_params(" " => " "))
+  end
+
   def test_create_url
     assert_equal(
       "http://news.google.com/news?hl=ja&ie=UTF-8&ned=us&num=10&oe=UTF-8&output=rss&q=keyword",

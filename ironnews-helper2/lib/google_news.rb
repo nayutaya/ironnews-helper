@@ -33,16 +33,21 @@ module GoogleNews
     return "http://news.google.com/news"
   end
 
+  def self.encode_params(params)
+    return params.
+      sort_by { |key, value| key }.
+      map     { |key, value| "#{CGI.escape(key.to_s)}=#{CGI.escape(value.to_s)}" }.
+      join("&")
+  end
+
   def self.create_url(options = {})
     options = options.dup
     keyword = options.delete(:keyword) || nil
     num     = options.delete(:num)     || nil
     raise(ArgumentError) unless options.empty?
 
-    query = self.create_params(:keyword => keyword, :num => num).
-      sort_by { |key, value| key }.
-      map     { |key, value| CGI.escape(key) + "=" + CGI.escape(value.to_s) }.join("&")
-    return self.create_base_url + "?" + query
+    params = self.create_params(:keyword => keyword, :num => num)
+    return self.create_base_url + "?" + self.encode_params(params)
   end
 
   # FIXME: タイムアウトの設定
