@@ -135,3 +135,21 @@ class GoogleNewsTest < Test::Unit::TestCase
     assert_equal(true, items.all? { |h| h.has_key?(:url) })
   end
 end
+
+class GoogleNewsArticleTest < Test::Unit::TestCase
+  def setup
+    @klass = GoogleNews::Article
+  end
+
+  def test_init
+    @obj = @klass.new(:title => "title", :url => "url")
+    assert_equal("title", @obj.title)
+    assert_equal("url", @obj.url)
+  end
+
+  def test_init__invalid_param
+    assert_raise(ArgumentError) {
+      @klass.new(:invalid => true)
+    }
+  end
+end

@@ -86,4 +86,15 @@ module GoogleNews
 
     return items
   end
+
+  class Article
+    def initialize(options = {})
+      options = options.dup
+      @title = options.delete(:title)
+      @url   = options.delete(:url)
+      raise(ArgumentError) unless options.empty?
+    end
+
+    attr_reader :title, :url
+  end
 end
